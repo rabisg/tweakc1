@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react";
-import { Button, Buttons, IconButton, SwitchItem } from "@crayonai/react-ui";
+import { Button, Buttons, SwitchItem } from "@crayonai/react-ui";
 import {
   Sparkles,
-  Undo2,
-  Redo2,
-  RotateCcw,
   MessageCircle,
   Share2,
   Code2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ExportModal } from "./ExportModal";
+import { ActionButtons } from "./ActionButtons";
 
 interface HeaderProps {
   theme: "light" | "dark";
@@ -94,24 +92,14 @@ export function Header({
             checked={theme === "dark"}
             onChange={(checked) => setTheme(checked ? "dark" : "light")}
           />
+          <ActionButtons
+            onUndo={onUndo}
+            onRedo={onRedo}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            onReset={onReset}
+          />
           <div className="flex items-center gap-1">
-            <IconButton
-              icon={<Undo2 size={16} />}
-              variant="tertiary"
-              onClick={onUndo}
-              disabled={!canUndo}
-            />
-            <IconButton
-              icon={<Redo2 size={16} />}
-              variant="tertiary"
-              onClick={onRedo}
-              disabled={!canRedo}
-            />
-            <IconButton
-              icon={<RotateCcw size={16} />}
-              variant="tertiary"
-              onClick={onReset}
-            />
             <Button
               variant="tertiary"
               iconLeft={<MessageCircle size={16} />}

@@ -25,6 +25,8 @@ function App({ theme, setTheme }: AppProps) {
     updateLetterSpacing,
     updateSpacing,
     updateBorderRadius,
+    loadPreset,
+    setCustomization,
     undo,
     redo,
     canUndo,
@@ -61,6 +63,9 @@ function App({ theme, setTheme }: AppProps) {
           onLetterSpacingChange={updateLetterSpacing}
           onSpacingChange={updateSpacing}
           onBorderRadiusChange={updateBorderRadius}
+          onPresetSelect={loadPreset}
+          onReset={clear}
+          onThemeGenerated={setCustomization}
         />
         <MainPanel
           mode={theme}

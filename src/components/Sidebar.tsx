@@ -7,20 +7,40 @@ import { SpacingControls } from "./SpacingControls";
 import { StrokeControls } from "./StrokeControls";
 import { ChatControls } from "./ChatControls";
 import { ShadowControls } from "./ShadowControls";
+import { PresetSelector } from "./PresetSelector";
+import { GenerateControls } from "./GenerateControls";
 
 interface SidebarProps {
   value: string;
   onValueChange: (value: string) => void;
   customization: ThemeCustomization;
-  onColorChange: (key: keyof ThemeCustomization['colors'], value?: string) => void;
-  onChartColorChange: (key: keyof ThemeCustomization['chartColors'], value?: string) => void;
-  onStrokeColorChange: (key: keyof ThemeCustomization['strokeColors'], value?: string | number) => void;
-  onChatColorChange: (key: keyof ThemeCustomization['chatColors'], value?: string) => void;
+  onColorChange: (
+    key: keyof ThemeCustomization["colors"],
+    value?: string
+  ) => void;
+  onChartColorChange: (
+    key: keyof ThemeCustomization["chartColors"],
+    value?: string
+  ) => void;
+  onStrokeColorChange: (
+    key: keyof ThemeCustomization["strokeColors"],
+    value?: string | number
+  ) => void;
+  onChatColorChange: (
+    key: keyof ThemeCustomization["chatColors"],
+    value?: string
+  ) => void;
   onShadowChange: (value?: ShadowConfig) => void;
-  onFontChange: (category: keyof ThemeCustomization['fonts'], value?: string) => void;
+  onFontChange: (
+    category: keyof ThemeCustomization["fonts"],
+    value?: string
+  ) => void;
   onLetterSpacingChange: (value?: number) => void;
   onSpacingChange: (value?: number) => void;
   onBorderRadiusChange: (value?: number) => void;
+  onPresetSelect: (presetName: string) => void;
+  onReset: () => void;
+  onThemeGenerated: (theme: ThemeCustomization) => void;
 }
 
 export function Sidebar({
@@ -36,6 +56,9 @@ export function Sidebar({
   onLetterSpacingChange,
   onSpacingChange,
   onBorderRadiusChange,
+  onPresetSelect,
+  onReset,
+  onThemeGenerated,
 }: SidebarProps) {
   return (
     <aside
@@ -45,6 +68,11 @@ export function Sidebar({
         borderColor: "var(--border-primary)",
       }}
     >
+      <PresetSelector
+        onPresetSelect={onPresetSelect}
+        onReset={onReset}
+        customization={customization}
+      />
       <Tabs value={value} onValueChange={onValueChange}>
         <TabsList>
           <TabsTrigger value="colors" text="Colors" />
@@ -53,9 +81,11 @@ export function Sidebar({
           <TabsTrigger value="generate" text="Generate" icon={<Sparkles />} />
         </TabsList>
         <TabsContent value="generate">
-          <div style={{ padding: '16px', color: "var(--text-secondary)" }}>
-            AI generation controls will appear here
-          </div>
+          <GenerateControls
+            customization={customization}
+            onThemeGenerated={onThemeGenerated}
+            onApiKeyChange={() => {}}
+          />
         </TabsContent>
         <TabsContent value="colors">
           <ChatControls

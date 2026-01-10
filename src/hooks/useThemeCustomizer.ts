@@ -10,6 +10,8 @@ import {
   loadStateFromUrl,
   clearUrlState,
 } from "../utils/urlState";
+import { getPreset } from "../utils/themePresets";
+import { loadFont } from "../utils/fontLoader";
 
 const initialState: ThemeCustomization = {
   colors: {},
@@ -36,6 +38,27 @@ export function useThemeCustomizer() {
       }
     });
   }, []);
+
+  // Load fonts whenever theme changes
+  useEffect(() => {
+    const loadFonts = async () => {
+      const fontsToLoad = [
+        state.fonts.body,
+        state.fonts.heading,
+        state.fonts.mono,
+      ].filter((font): font is string => !!font);
+
+      for (const font of fontsToLoad) {
+        try {
+          await loadFont(font);
+        } catch (err) {
+          console.error(`Failed to load font ${font}:`, err);
+        }
+      }
+    };
+
+    loadFonts();
+  }, [state.fonts.body, state.fonts.heading, state.fonts.mono]);
 
   // Update color
   const updateColor = useCallback(
@@ -160,6 +183,17 @@ export function useThemeCustomizer() {
     [state, setState]
   );
 
+  // Load preset
+  const loadPreset = useCallback(
+    (presetName: string) => {
+      const preset = getPreset(presetName);
+      if (preset) {
+        setState(preset.config);
+      }
+    },
+    [setState]
+  );
+
   // Generate theme objects
   const generatedTheme = useMemo(() => {
     return generateCompleteTheme(state);
@@ -191,6 +225,8 @@ export function useThemeCustomizer() {
     updateStrokeColor,
     updateChatColor,
     updateShadow,
+    loadPreset,
+    setCustomization: setState,
 
     // History functions
     undo,

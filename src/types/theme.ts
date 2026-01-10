@@ -1,58 +1,63 @@
-export interface ShadowConfig {
-  color?: string;
-  opacity?: number;
-  blur?: number;
-  spread?: number;
-  offsetX?: number;
-  offsetY?: number;
-}
+import { z } from "zod";
 
-export interface ThemeCustomization {
-  colors: {
-    background?: string;
-    container?: string;
-    primary?: string;
-    textPrimary?: string;
-    textSecondary?: string;
-    linkText?: string;
-    danger?: string;
-    success?: string;
-    info?: string;
-    alert?: string;
-  };
-  chartColors: {
-    color1?: string;
-    color2?: string;
-    color3?: string;
-  };
-  strokeColors: {
-    base?: string;
-    opacity?: number; // Base opacity, variants will be auto-generated
-  };
-  chatColors: {
-    containerBg?: string;
-    assistantBg?: string;
-    assistantText?: string;
-    userBg?: string;
-    userText?: string;
-  };
-  shadow?: ShadowConfig; // Single base shadow, others auto-generated
-  colorEngine: "default";
-  fonts: {
-    body?: string;
-    heading?: string;
-    mono?: string;
-  };
-  letterSpacing: {
-    base?: number; // in em units
-  };
-  spacing: {
-    base?: number;
-  };
-  borderRadius: {
-    base?: number;
-  };
-}
+export const ShadowConfigSchema = z.object({
+  color: z.string().optional(),
+  opacity: z.number().optional(),
+  blur: z.number().optional(),
+  spread: z.number().optional(),
+  offsetX: z.number().optional(),
+  offsetY: z.number().optional(),
+});
+
+export const ThemeCustomizationSchema = z.object({
+  colors: z.object({
+    background: z.string().optional(),
+    container: z.string().optional(),
+    primary: z.string().optional(),
+    textPrimary: z.string().optional(),
+    textSecondary: z.string().optional(),
+    linkText: z.string().optional(),
+    danger: z.string().optional(),
+    success: z.string().optional(),
+    info: z.string().optional(),
+    alert: z.string().optional(),
+  }),
+  chartColors: z.object({
+    color1: z.string().optional(),
+    color2: z.string().optional(),
+    color3: z.string().optional(),
+  }),
+  strokeColors: z.object({
+    base: z.string().optional(),
+    opacity: z.number().min(0).max(1).optional(), // Base opacity, variants will be auto-generated
+  }),
+  chatColors: z.object({
+    containerBg: z.string().optional(),
+    assistantBg: z.string().optional(),
+    assistantText: z.string().optional(),
+    userBg: z.string().optional(),
+    userText: z.string().optional(),
+  }),
+  shadow: ShadowConfigSchema.optional(), // Single base shadow, others auto-generated
+  colorEngine: z.literal("default"),
+  fonts: z.object({
+    body: z.string().optional(),
+    heading: z.string().optional(),
+    mono: z.string().optional(),
+  }),
+  letterSpacing: z.object({
+    base: z.number().optional(), // in em units
+  }),
+  spacing: z.object({
+    base: z.number().min(0.5).max(2).optional(),
+  }),
+  borderRadius: z.object({
+    base: z.number().min(0).max(8).optional(), // in rem, 0 (sharp) to 8 (very rounded)
+  }),
+});
+
+export type ShadowConfig = z.infer<typeof ShadowConfigSchema>;
+export type ThemeCustomization = z.infer<typeof ThemeCustomizationSchema>;
 
 // Future enhancements that could be added:
 // - Interactive state colors (neutral default/hover/pressed/disabled)
