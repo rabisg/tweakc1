@@ -1,12 +1,42 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@crayonai/react-ui";
 import { Sparkles } from "lucide-react";
+import { ThemeCustomization, ShadowConfig } from "../types/theme";
+import { ColorControls } from "./ColorControls";
+import { FontControls } from "./FontControls";
+import { SpacingControls } from "./SpacingControls";
+import { StrokeControls } from "./StrokeControls";
+import { ChatControls } from "./ChatControls";
+import { ShadowControls } from "./ShadowControls";
 
 interface SidebarProps {
   value: string;
   onValueChange: (value: string) => void;
+  customization: ThemeCustomization;
+  onColorChange: (key: keyof ThemeCustomization['colors'], value?: string) => void;
+  onChartColorChange: (key: keyof ThemeCustomization['chartColors'], value?: string) => void;
+  onStrokeColorChange: (key: keyof ThemeCustomization['strokeColors'], value?: string | number) => void;
+  onChatColorChange: (key: keyof ThemeCustomization['chatColors'], value?: string) => void;
+  onShadowChange: (value?: ShadowConfig) => void;
+  onFontChange: (category: keyof ThemeCustomization['fonts'], value?: string) => void;
+  onLetterSpacingChange: (value?: number) => void;
+  onSpacingChange: (value?: number) => void;
+  onBorderRadiusChange: (value?: number) => void;
 }
 
-export function Sidebar({ value, onValueChange }: SidebarProps) {
+export function Sidebar({
+  value,
+  onValueChange,
+  customization,
+  onColorChange,
+  onChartColorChange,
+  onStrokeColorChange,
+  onChatColorChange,
+  onShadowChange,
+  onFontChange,
+  onLetterSpacingChange,
+  onSpacingChange,
+  onBorderRadiusChange,
+}: SidebarProps) {
   return (
     <aside
       className="w-140 overflow-y-auto flex flex-col"
@@ -23,24 +53,45 @@ export function Sidebar({ value, onValueChange }: SidebarProps) {
           <TabsTrigger value="generate" text="Generate" icon={<Sparkles />} />
         </TabsList>
         <TabsContent value="generate">
-          <div style={{ color: "var(--text-secondary)" }}>
+          <div style={{ padding: '16px', color: "var(--text-secondary)" }}>
             AI generation controls will appear here
           </div>
         </TabsContent>
         <TabsContent value="colors">
-          <div style={{ color: "var(--text-secondary)" }}>
-            Color controls will appear here
-          </div>
+          <ChatControls
+            chatColors={customization.chatColors}
+            onChatColorChange={onChatColorChange}
+          />
+          <ColorControls
+            colors={customization.colors}
+            chartColors={customization.chartColors}
+            onColorChange={onColorChange}
+            onChartColorChange={onChartColorChange}
+          />
+          <StrokeControls
+            strokeColors={customization.strokeColors}
+            onStrokeColorChange={onStrokeColorChange}
+          />
         </TabsContent>
         <TabsContent value="typography">
-          <div style={{ color: "var(--text-secondary)" }}>
-            Typography controls will appear here
-          </div>
+          <FontControls
+            fonts={customization.fonts}
+            letterSpacing={customization.letterSpacing}
+            onFontChange={onFontChange}
+            onLetterSpacingChange={onLetterSpacingChange}
+          />
         </TabsContent>
         <TabsContent value="other">
-          <div style={{ color: "var(--text-secondary)" }}>
-            Other controls will appear here
-          </div>
+          <SpacingControls
+            spacing={customization.spacing}
+            borderRadius={customization.borderRadius}
+            onSpacingChange={onSpacingChange}
+            onBorderRadiusChange={onBorderRadiusChange}
+          />
+          <ShadowControls
+            shadow={customization.shadow}
+            onShadowChange={onShadowChange}
+          />
         </TabsContent>
       </Tabs>
     </aside>

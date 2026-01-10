@@ -111,7 +111,17 @@ const MOCK_MESSAGES: Record<string, Message[]> = {
   ],
 };
 
-export function MainPanel({ mode = "light" }: { mode?: "light" | "dark" }) {
+interface MainPanelProps {
+  mode?: "light" | "dark";
+  theme?: Record<string, any>;
+  darkTheme?: Record<string, any>;
+}
+
+export function MainPanel({
+  mode = "light",
+  theme,
+  darkTheme,
+}: MainPanelProps) {
   const threadListManager = useThreadListManager({
     fetchThreadList: async () => {
       return MOCK_THREADS;
@@ -166,7 +176,7 @@ export function MainPanel({ mode = "light" }: { mode?: "light" | "dark" }) {
   return (
     <main className="flex-1 relative">
       <div className="absolute inset-0">
-        <ThemeProvider mode={mode}>
+        <ThemeProvider mode={mode} theme={theme} darkTheme={darkTheme}>
           <C1Chat
             scrollVariant="once"
             threadManager={threadManager}

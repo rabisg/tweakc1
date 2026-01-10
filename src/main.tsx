@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@crayonai/react-ui";
+import { Toaster } from "sonner";
 import "@crayonai/react-ui/styles/index.css";
 import App from "./App";
 import "./style.css";
@@ -15,6 +16,7 @@ function Root() {
   return (
     <ThemeProvider mode={theme}>
       <App theme={theme} setTheme={setTheme} />
+      <Toaster />
     </ThemeProvider>
   );
 }
