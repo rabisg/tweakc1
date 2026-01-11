@@ -22,6 +22,7 @@
     "@crayonai/react-core": "^0.7.6",
     "@crayonai/react-ui": "0.9.11",
     "@thesysai/genui-sdk": "^0.7.15",
+    "d3-sankey": "^0.12.3",
     "lucide-react": "^0.469.0",
     "openai": "^6.16.0",
     "react": "^18.3.0",

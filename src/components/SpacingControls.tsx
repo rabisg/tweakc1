@@ -9,33 +9,6 @@ interface SpacingControlsProps {
   onBorderRadiusChange: (value?: number) => void;
 }
 
-function generateSpacingPreview(base: number): string[] {
-  return [
-    `spacing3xs: ${base}px`,
-    `spacing2xs: ${base * 2}px`,
-    `spacingXs: ${base * 3}px`,
-    `spacingS: ${base * 4}px`,
-    `spacingM: ${base * 6}px`,
-    `spacingL: ${base * 9}px`,
-    `spacingXl: ${base * 12}px`,
-    `spacing2xl: ${base * 18}px`,
-    `spacing3xl: ${base * 24}px`,
-  ];
-}
-
-function generateRadiusPreview(base: number): string[] {
-  return [
-    `rounded3xs: ${base}px`,
-    `rounded2xs: ${base * 2}px`,
-    `roundedXs: ${base * 3}px`,
-    `roundedS: ${base * 4}px`,
-    `roundedM: ${base * 5}px`,
-    `roundedL: ${base * 6}px`,
-    `roundedXl: ${base * 8}px`,
-    `rounded2xl: ${base * 10}px`,
-    `rounded3xl: ${base * 12}px`,
-  ];
-}
 
 export function SpacingControls({
   spacing,

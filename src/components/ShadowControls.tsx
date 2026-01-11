@@ -1,7 +1,7 @@
 import { Slider } from "@crayonai/react-ui";
 import { Section } from "./Section";
 import { ColorPicker } from "./ColorPicker";
-import { ThemeCustomization, ShadowConfig } from "../types/theme";
+import { ShadowConfig } from "../types/theme";
 
 interface ShadowControlsProps {
   shadow?: ShadowConfig;
@@ -28,18 +28,6 @@ export function ShadowControls({
     onShadowChange({ ...config, [field]: value });
   };
 
-  // Generate preview shadows at different scales
-  const generatePreview = (scale: number) => {
-    const blur = Math.round((config.blur || 4) * scale);
-    const spread = Math.round((config.spread || 0) * scale);
-    const offsetX = Math.round((config.offsetX || 0) * scale);
-    const offsetY = Math.round((config.offsetY || 1) * scale);
-    const finalColor = config.color?.replace(
-      /rgba?\((\d+),\s*(\d+),\s*(\d+).*\)/,
-      (_, r, g, b) => `rgba(${r}, ${g}, ${b}, ${config.opacity})`
-    );
-    return `${offsetX}px ${offsetY}px ${blur}px ${spread}px ${finalColor}`;
-  };
 
   return (
     <div style={{ padding: "16px" }}>

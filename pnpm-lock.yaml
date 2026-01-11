@@ -17,6 +17,9 @@ importers:
       '@thesysai/genui-sdk':
         specifier: ^0.7.15
         version: 0.7.15(7vmdzghwbg6ub3zvtm2yxoqkom)
+      d3-sankey:
+        specifier: ^0.12.3
+        version: 0.12.3
       lucide-react:
         specifier: ^0.469.0
         version: 0.469.0(react@18.3.1)

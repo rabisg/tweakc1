@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Input } from "@crayonai/react-ui";
 import { Settings, Sparkles } from "lucide-react";
-import { ThemeCustomization, DualModeThemeCustomization, ThemeMode } from "../types/theme";
+import { ThemeCustomization, ThemeMode } from "../types/theme";
 import { getApiKey, setApiKey, clearApiKey } from "../utils/apiKeyStorage";
 import { generateThemeWithAI } from "../utils/aiThemeGenerator";
 import { toast } from "sonner";
