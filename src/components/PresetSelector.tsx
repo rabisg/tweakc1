@@ -55,7 +55,7 @@ export function PresetSelector({
     <div
       style={{
         padding: "16px",
-        borderBottom: "1px solid var(--border-primary)",
+        borderBottom: "1px solid var(--crayon-stroke-emphasis)",
       }}
     >
       <label
@@ -64,7 +64,7 @@ export function PresetSelector({
           fontSize: "14px",
           fontWeight: "500",
           marginBottom: "8px",
-          color: "var(--text-primary)",
+          color: "var(--crayon-primary-text)",
         }}
       >
         Theme Preset

@@ -45,7 +45,7 @@ export function ExportModal({ isOpen, onClose, themeCode }: ExportModalProps) {
           style={{
             padding: "8px 16px",
             fontSize: "14px",
-            border: "1px solid var(--border-primary)",
+            border: "1px solid var(--crayon-stroke-emphasis)",
             borderRadius: "6px",
             background: "var(--bg-secondary)",
             cursor: "pointer",

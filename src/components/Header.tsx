@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
-import { Button, Buttons, SwitchItem } from "@crayonai/react-ui";
-import {
-  Sparkles,
-  MessageCircle,
-  Share2,
-  Code2,
-} from "lucide-react";
+import { Button, SwitchItem } from "@crayonai/react-ui";
+import { Sparkles, MessageCircle, Share2, Code2 } from "lucide-react";
 import { toast } from "sonner";
 import { ExportModal } from "./ExportModal";
 import { ActionButtons } from "./ActionButtons";
@@ -75,8 +70,7 @@ export function Header({
       <header
         className="flex items-center justify-between p-2"
         style={{
-          backgroundColor: "var(--bg-tertiary)",
-          borderColor: "var(--border-primary)",
+          borderBottom: "1px solid var(--crayon-stroke-emphasis)",
         }}
       >
         <div className="flex items-center">
@@ -109,10 +103,18 @@ export function Header({
             >
               Discord
             </Button>
-            <Button variant="tertiary" iconLeft={<Share2 size={16} />} onClick={handleShare}>
+            <Button
+              variant="tertiary"
+              iconLeft={<Share2 size={16} />}
+              onClick={handleShare}
+            >
               Share
             </Button>
-            <Button variant="primary" iconLeft={<Code2 size={16} />} onClick={handleExport}>
+            <Button
+              variant="primary"
+              iconLeft={<Code2 size={16} />}
+              onClick={handleExport}
+            >
               Export
             </Button>
           </div>

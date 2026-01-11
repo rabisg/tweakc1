@@ -1,5 +1,10 @@
 import { useCallback, useMemo, useEffect } from "react";
-import { ThemeCustomization, ShadowConfig } from "../types/theme";
+import {
+  DualModeThemeCustomization,
+  ThemeCustomization,
+  ShadowConfig,
+  ThemeMode,
+} from "../types/theme";
 import { useHistory } from "./useHistory";
 import {
   generateCompleteTheme,
@@ -13,7 +18,7 @@ import {
 import { getPreset } from "../utils/themePresets";
 import { loadFont } from "../utils/fontLoader";
 
-const initialState: ThemeCustomization = {
+const emptyThemeCustomization: ThemeCustomization = {
   colors: {},
   chartColors: {},
   strokeColors: {},
@@ -25,9 +30,18 @@ const initialState: ThemeCustomization = {
   borderRadius: {},
 };
 
-export function useThemeCustomizer() {
+const initialState: DualModeThemeCustomization = {
+  light: { ...emptyThemeCustomization },
+  dark: { ...emptyThemeCustomization },
+};
+
+export function useThemeCustomizer(displayMode: ThemeMode) {
   const { state, setState, undo, redo, canUndo, canRedo, clear } =
-    useHistory<ThemeCustomization>(initialState);
+    useHistory<DualModeThemeCustomization>(initialState);
+
+  // Track which mode is being edited (follows display mode)
+  const currentMode = displayMode;
+  const currentConfig = state[currentMode];
 
   // Load state from URL on mount
   useEffect(() => {
@@ -39,16 +53,22 @@ export function useThemeCustomizer() {
     });
   }, []);
 
-  // Load fonts whenever theme changes
+  // Load fonts whenever theme changes (for both modes)
   useEffect(() => {
     const loadFonts = async () => {
       const fontsToLoad = [
-        state.fonts.body,
-        state.fonts.heading,
-        state.fonts.mono,
+        state.light.fonts.body,
+        state.light.fonts.heading,
+        state.light.fonts.mono,
+        state.dark.fonts.body,
+        state.dark.fonts.heading,
+        state.dark.fonts.mono,
       ].filter((font): font is string => !!font);
 
-      for (const font of fontsToLoad) {
+      // Deduplicate
+      const uniqueFonts = Array.from(new Set(fontsToLoad));
+
+      for (const font of uniqueFonts) {
         try {
           await loadFont(font);
         } catch (err) {
@@ -58,20 +78,30 @@ export function useThemeCustomizer() {
     };
 
     loadFonts();
-  }, [state.fonts.body, state.fonts.heading, state.fonts.mono]);
+  }, [
+    state.light.fonts.body,
+    state.light.fonts.heading,
+    state.light.fonts.mono,
+    state.dark.fonts.body,
+    state.dark.fonts.heading,
+    state.dark.fonts.mono,
+  ]);
 
   // Update color
   const updateColor = useCallback(
     (key: keyof ThemeCustomization["colors"], value?: string) => {
       setState({
         ...state,
-        colors: {
-          ...state.colors,
-          [key]: value,
+        [currentMode]: {
+          ...currentConfig,
+          colors: {
+            ...currentConfig.colors,
+            [key]: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update chart color
@@ -79,13 +109,16 @@ export function useThemeCustomizer() {
     (key: keyof ThemeCustomization["chartColors"], value?: string) => {
       setState({
         ...state,
-        chartColors: {
-          ...state.chartColors,
-          [key]: value,
+        [currentMode]: {
+          ...currentConfig,
+          chartColors: {
+            ...currentConfig.chartColors,
+            [key]: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update font
@@ -93,13 +126,16 @@ export function useThemeCustomizer() {
     (category: keyof ThemeCustomization["fonts"], value?: string) => {
       setState({
         ...state,
-        fonts: {
-          ...state.fonts,
-          [category]: value,
+        [currentMode]: {
+          ...currentConfig,
+          fonts: {
+            ...currentConfig.fonts,
+            [category]: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update letter spacing
@@ -107,12 +143,15 @@ export function useThemeCustomizer() {
     (value?: number) => {
       setState({
         ...state,
-        letterSpacing: {
-          base: value,
+        [currentMode]: {
+          ...currentConfig,
+          letterSpacing: {
+            base: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update spacing
@@ -120,12 +159,15 @@ export function useThemeCustomizer() {
     (value?: number) => {
       setState({
         ...state,
-        spacing: {
-          base: value,
+        [currentMode]: {
+          ...currentConfig,
+          spacing: {
+            base: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update border radius
@@ -133,12 +175,15 @@ export function useThemeCustomizer() {
     (value?: number) => {
       setState({
         ...state,
-        borderRadius: {
-          base: value,
+        [currentMode]: {
+          ...currentConfig,
+          borderRadius: {
+            base: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update stroke color
@@ -149,13 +194,16 @@ export function useThemeCustomizer() {
     ) => {
       setState({
         ...state,
-        strokeColors: {
-          ...state.strokeColors,
-          [key]: value,
+        [currentMode]: {
+          ...currentConfig,
+          strokeColors: {
+            ...currentConfig.strokeColors,
+            [key]: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update chat color
@@ -163,13 +211,16 @@ export function useThemeCustomizer() {
     (key: keyof ThemeCustomization["chatColors"], value?: string) => {
       setState({
         ...state,
-        chatColors: {
-          ...state.chatColors,
-          [key]: value,
+        [currentMode]: {
+          ...currentConfig,
+          chatColors: {
+            ...currentConfig.chatColors,
+            [key]: value,
+          },
         },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update shadow
@@ -177,10 +228,13 @@ export function useThemeCustomizer() {
     (value?: ShadowConfig) => {
       setState({
         ...state,
-        shadow: value,
+        [currentMode]: {
+          ...currentConfig,
+          shadow: value,
+        },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
   );
 
   // Update custom CSS
@@ -188,10 +242,24 @@ export function useThemeCustomizer() {
     (value?: string) => {
       setState({
         ...state,
-        customCss: value,
+        [currentMode]: {
+          ...currentConfig,
+          customCss: value,
+        },
       });
     },
-    [state, setState]
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Update current mode's entire config (for AI generation)
+  const updateCurrentModeConfig = useCallback(
+    (newConfig: ThemeCustomization) => {
+      setState({
+        ...state,
+        [currentMode]: newConfig,
+      });
+    },
+    [state, currentMode, setState]
   );
 
   // Load preset
@@ -207,17 +275,16 @@ export function useThemeCustomizer() {
 
   // Generate theme objects
   const generatedTheme = useMemo(() => {
-    return generateCompleteTheme(state);
-  }, [state]);
+    return {
+      light: generateCompleteTheme(state.light, "light"),
+      dark: generateCompleteTheme(state.dark, "dark"),
+    };
+  }, [state.light, state.dark]);
 
   // Export theme code
   const exportThemeCode = useCallback(() => {
-    return generateThemeCode(
-      generatedTheme.theme,
-      generatedTheme.darkTheme,
-      state.customCss
-    );
-  }, [generatedTheme, state.customCss]);
+    return generateThemeCode(state.light, state.dark);
+  }, [state.light, state.dark]);
 
   // Generate share URL
   const getShareUrl = useCallback(async () => {
@@ -226,9 +293,10 @@ export function useThemeCustomizer() {
 
   return {
     // State
-    customization: state,
-    theme: generatedTheme.theme,
-    darkTheme: generatedTheme.darkTheme,
+    customization: currentConfig,
+    theme: generatedTheme.light,
+    darkTheme: generatedTheme.dark,
+    currentMode,
 
     // Update functions
     updateColor,
@@ -241,6 +309,7 @@ export function useThemeCustomizer() {
     updateChatColor,
     updateShadow,
     updateCustomCss,
+    updateCurrentModeConfig,
     loadPreset,
     setCustomization: setState,
 

@@ -426,73 +426,48 @@ export function generateChartPalette(
   return palette.slice(0, 11);
 }
 
-// Generate complete theme
-export function generateCompleteTheme(customization: ThemeCustomization): {
-  theme?: Record<string, any>;
-  darkTheme?: Record<string, any>;
-} {
+// Generate complete theme for a single mode
+export function generateCompleteTheme(
+  customization: ThemeCustomization,
+  mode: "light" | "dark"
+): Record<string, any> {
   const engine =
     colorEngines[customization.colorEngine] || colorEngines.default;
 
-  const lightTheme: Record<string, any> = {};
-  const darkTheme: Record<string, any> = {};
+  const theme: Record<string, any> = {};
 
   // Generate colors
-  const lightColors = generateSemanticColors(
-    customization.colors,
-    engine,
-    "light"
-  );
-  const darkColors = generateSemanticColors(
-    customization.colors,
-    engine,
-    "dark"
-  );
-  Object.assign(lightTheme, lightColors);
-  Object.assign(darkTheme, darkColors);
+  const colors = generateSemanticColors(customization.colors, engine, mode);
+  Object.assign(theme, colors);
 
   // Generate fonts
   const fonts = generateFontVariables(
     customization.fonts,
     customization.letterSpacing.base
   );
-  Object.assign(lightTheme, fonts);
-  Object.assign(darkTheme, fonts);
+  Object.assign(theme, fonts);
 
   // Generate spacing
   if (customization.spacing.base !== undefined) {
     const spacing = generateSpacingScale(customization.spacing.base);
-    Object.assign(lightTheme, spacing);
-    Object.assign(darkTheme, spacing);
+    Object.assign(theme, spacing);
   }
 
   // Generate border radius
   if (customization.borderRadius.base !== undefined) {
     const radius = generateBorderRadiusScale(customization.borderRadius.base);
-    Object.assign(lightTheme, radius);
-    Object.assign(darkTheme, radius);
+    Object.assign(theme, radius);
   }
 
   // Generate chart palette
-  const lightChartPalette = generateChartPalette(
-    customization.chartColors,
-    "light"
-  );
-  const darkChartPalette = generateChartPalette(
-    customization.chartColors,
-    "dark"
-  );
-  if (lightChartPalette.length > 0) {
-    lightTheme.defaultChartPalette = lightChartPalette;
-  }
-  if (darkChartPalette.length > 0) {
-    darkTheme.defaultChartPalette = darkChartPalette;
+  const chartPalette = generateChartPalette(customization.chartColors, mode);
+  if (chartPalette.length > 0) {
+    theme.defaultChartPalette = chartPalette;
   }
 
   // Generate shadows
   const shadows = generateShadows(customization.shadow);
-  Object.assign(lightTheme, shadows);
-  Object.assign(darkTheme, shadows);
+  Object.assign(theme, shadows);
 
   // Generate stroke colors
   const strokes = generateStrokeColors(customization.strokeColors, {
@@ -502,31 +477,23 @@ export function generateCompleteTheme(customization: ThemeCustomization): {
     alert: customization.colors.alert,
     accent: customization.colors.primary,
   });
-  Object.assign(lightTheme, strokes);
-  Object.assign(darkTheme, strokes);
+  Object.assign(theme, strokes);
 
   // Generate chat colors
   const chatColors = generateChatColors(customization.chatColors);
-  Object.assign(lightTheme, chatColors);
-  Object.assign(darkTheme, chatColors);
+  Object.assign(theme, chatColors);
 
-  // Return undefined if no customizations
-  if (Object.keys(lightTheme).length === 0) {
-    return { theme: undefined, darkTheme: undefined };
-  }
-
-  return { theme: lightTheme, darkTheme: darkTheme };
+  // Always return theme object (even if empty)
+  return theme;
 }
 
 // Generate TypeScript code for export
 export function generateThemeCode(
-  theme?: Record<string, any>,
-  darkTheme?: Record<string, any>,
-  customCss?: string
+  lightCustomization: ThemeCustomization,
+  darkCustomization: ThemeCustomization
 ): string {
-  if (!theme || !darkTheme) {
-    return "export const customTheme = {\n  theme: {},\n  darkTheme: {}\n};";
-  }
+  const lightTheme = generateCompleteTheme(lightCustomization, "light");
+  const darkTheme = generateCompleteTheme(darkCustomization, "dark");
 
   const formatValue = (value: any): string => {
     if (Array.isArray(value)) {
@@ -540,30 +507,49 @@ export function generateThemeCode(
     indent: string = "    "
   ): string => {
     const entries = Object.entries(obj);
+    if (entries.length === 0) {
+      return "";
+    }
     return entries
       .map(([key, value]) => `${indent}${key}: ${formatValue(value)}`)
       .join(",\n");
   };
 
-  const customCssSection = customCss
-    ? `\n\nexport const customCss = \`${customCss}\`;
+  const lightCss = lightCustomization.customCss;
+  const darkCss = darkCustomization.customCss;
+
+  let customCssSection = "";
+  if (lightCss || darkCss) {
+    const lightCssCode = lightCss
+      ? `export const lightCustomCss = \`${lightCss}\`;`
+      : "";
+    const darkCssCode = darkCss
+      ? `export const darkCustomCss = \`${darkCss}\`;`
+      : "";
+
+    customCssSection = `\n\n${lightCssCode}${
+      lightCss && darkCss ? "\n\n" : ""
+    }${darkCssCode}
 
 // Apply custom CSS:
 // Add this to your component:
 // useEffect(() => {
 //   const style = document.createElement('style');
-//   style.textContent = customCss;
+//   style.textContent = mode === 'light' ? lightCustomCss : darkCustomCss;
 //   document.head.appendChild(style);
 //   return () => style.remove();
-// }, []);`
-    : "";
+// }, [mode]);`;
+  }
+
+  const lightThemeContent = formatObject(lightTheme);
+  const darkThemeContent = formatObject(darkTheme);
 
   return `export const customTheme = {
   theme: {
-${formatObject(theme)}
+${lightThemeContent}
   },
   darkTheme: {
-${formatObject(darkTheme)}
+${darkThemeContent}
   }
 };${customCssSection}
 

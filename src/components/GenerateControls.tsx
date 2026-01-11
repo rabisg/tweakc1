@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button, Input } from "@crayonai/react-ui";
 import { Settings, Sparkles } from "lucide-react";
-import { ThemeCustomization } from "../types/theme";
+import { ThemeCustomization, DualModeThemeCustomization, ThemeMode } from "../types/theme";
 import { getApiKey, setApiKey, clearApiKey } from "../utils/apiKeyStorage";
 import { generateThemeWithAI } from "../utils/aiThemeGenerator";
 import { toast } from "sonner";
 
 interface GenerateControlsProps {
   customization: ThemeCustomization;
+  currentMode: ThemeMode;
   onThemeGenerated: (theme: ThemeCustomization) => void;
   onApiKeyChange: () => void;
 }
@@ -21,6 +22,7 @@ const CONVERSATION_STARTERS = [
 
 export function GenerateControls({
   customization,
+  currentMode,
   onThemeGenerated,
   onApiKeyChange,
 }: GenerateControlsProps) {
@@ -78,7 +80,8 @@ export function GenerateControls({
       const generatedTheme = await generateThemeWithAI(
         key,
         description,
-        customization
+        customization,
+        currentMode
       );
       onThemeGenerated(generatedTheme);
       toast.success("Theme generated successfully!");
@@ -116,7 +119,7 @@ export function GenerateControls({
               fontSize: "24px",
               fontWeight: 600,
               marginBottom: "12px",
-              color: "var(--text-primary)",
+              color: "var(--crayon-primary-text)",
             }}
           >
             Set up OpenAI API Key
@@ -124,7 +127,7 @@ export function GenerateControls({
           <p
             style={{
               fontSize: "14px",
-              color: "var(--text-secondary)",
+              color: "var(--crayon-secondary-text)",
               marginBottom: "32px",
               lineHeight: 1.5,
             }}
@@ -198,7 +201,7 @@ export function GenerateControls({
           style={{
             fontSize: "32px",
             fontWeight: 500,
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
             lineHeight: 1.2,
             marginBottom: "24px",
             flex: 1,
@@ -216,7 +219,7 @@ export function GenerateControls({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "var(--text-secondary)",
+            color: "var(--crayon-secondary-text)",
             borderRadius: "6px",
           }}
           title="Manage API key"
@@ -246,9 +249,9 @@ export function GenerateControls({
             padding: "12px 16px",
             fontSize: "15px",
             borderRadius: "8px",
-            border: "1px solid var(--border-primary)",
-            backgroundColor: "var(--bg-primary)",
-            color: "var(--text-primary)",
+            border: "1px solid var(--crayon-stroke-emphasis)",
+            backgroundColor: "var(--crayon-background-fills)",
+            color: "var(--crayon-primary-text)",
             resize: "vertical",
             fontFamily: "inherit",
             lineHeight: 1.5,
@@ -291,7 +294,7 @@ export function GenerateControls({
         style={{
           marginBottom: "12px",
           fontSize: "13px",
-          color: "var(--text-secondary)",
+          color: "var(--crayon-secondary-text)",
           fontWeight: 500,
         }}
       >
@@ -313,9 +316,9 @@ export function GenerateControls({
             style={{
               padding: "16px 20px",
               borderRadius: "8px",
-              border: "1px solid var(--border-primary)",
-              backgroundColor: "var(--bg-primary)",
-              color: "var(--text-primary)",
+              border: "1px solid var(--crayon-stroke-emphasis)",
+              backgroundColor: "var(--crayon-background-fills)",
+              color: "var(--crayon-primary-text)",
               fontSize: "15px",
               textAlign: "left",
               cursor: loadingStarter ? "not-allowed" : "pointer",
@@ -330,8 +333,8 @@ export function GenerateControls({
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--border-primary)";
-              e.currentTarget.style.backgroundColor = "var(--bg-primary)";
+              e.currentTarget.style.borderColor = "var(--crayon-stroke-emphasis)";
+              e.currentTarget.style.backgroundColor = "var(--crayon-background-fills)";
             }}
           >
             {loadingStarter === starter ? (
@@ -379,7 +382,7 @@ export function GenerateControls({
             padding: "16px",
             borderRadius: "8px",
             backgroundColor: "var(--bg-secondary)",
-            border: "1px solid var(--border-primary)",
+            border: "1px solid var(--crayon-stroke-emphasis)",
           }}
         >
           <h3
@@ -387,7 +390,7 @@ export function GenerateControls({
               fontSize: "14px",
               fontWeight: 600,
               marginBottom: "12px",
-              color: "var(--text-primary)",
+              color: "var(--crayon-primary-text)",
             }}
           >
             API Key Settings

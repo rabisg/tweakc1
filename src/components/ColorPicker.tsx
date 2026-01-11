@@ -96,7 +96,7 @@ export function ColorPicker({
             fontSize: "14px",
             fontWeight: "400",
             marginBottom: "8px",
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
           }}
         >
           {label}
@@ -109,7 +109,7 @@ export function ColorPicker({
             height: "48px",
             borderRadius: "6px",
             background: value || "#ffffff",
-            border: "1px solid var(--border-primary)",
+            border: "1px solid var(--crayon-stroke-emphasis)",
             flexShrink: 0,
             cursor: "pointer",
             position: "relative",
@@ -147,11 +147,11 @@ export function ColorPicker({
             padding: "12px",
             fontSize: "14px",
             border: `1px solid ${
-              isValid ? "var(--border-primary)" : "#ef4444"
+              isValid ? "var(--crayon-stroke-emphasis)" : "#ef4444"
             }`,
             borderRadius: "6px",
-            background: "var(--bg-primary)",
-            color: isValid ? "var(--text-primary)" : "#ef4444",
+            background: "var(--crayon-background-fills)",
+            color: isValid ? "var(--crayon-primary-text)" : "#ef4444",
             outline: "none",
             transition: "border-color 0.2s, color 0.2s",
           }}

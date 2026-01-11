@@ -19,17 +19,18 @@ export function StrokeControls({
   const opacity = strokeColors.opacity ?? 0.2;
 
   return (
-    <Section title="Stroke Colors" defaultOpen={false}>
-      <div
-        style={{
-          marginBottom: "16px",
-          fontSize: "13px",
-          color: "var(--text-secondary)",
-        }}
-      >
-        Configure base stroke color and opacity. All stroke variants
-        (interactive, emphasis, status) will be auto-generated.
-      </div>
+    <div style={{ padding: "16px" }}>
+      <Section title="Stroke Colors" defaultOpen={false}>
+        <div
+          style={{
+            marginBottom: "16px",
+            fontSize: "13px",
+            color: "var(--crayon-secondary-text)",
+          }}
+        >
+          Configure base stroke color and opacity. All stroke variants
+          (interactive, emphasis, status) will be auto-generated.
+        </div>
 
       <ColorPicker
         label="Base Color"
@@ -44,7 +45,7 @@ export function StrokeControls({
             fontSize: "14px",
             fontWeight: "400",
             marginBottom: "8px",
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
           }}
         >
           Base Opacity
@@ -74,10 +75,10 @@ export function StrokeControls({
                   width: "80px",
                   padding: "8px 12px",
                   fontSize: "14px",
-                  border: "1px solid var(--border-primary)",
+                  border: "1px solid var(--crayon-stroke-emphasis)",
                   borderRadius: "6px",
-                  background: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  background: "var(--crayon-background-fills)",
+                  color: "var(--crayon-primary-text)",
                   textAlign: "right",
                   outline: "none",
                 }}
@@ -91,7 +92,7 @@ export function StrokeControls({
         <div
           style={{
             fontSize: "13px",
-            color: "var(--text-secondary)",
+            color: "var(--crayon-secondary-text)",
             marginBottom: "12px",
           }}
         >
@@ -108,7 +109,7 @@ export function StrokeControls({
             <div
               style={{
                 fontSize: "12px",
-                color: "var(--text-secondary)",
+                color: "var(--crayon-secondary-text)",
                 marginBottom: "4px",
               }}
             >
@@ -130,7 +131,7 @@ export function StrokeControls({
             <div
               style={{
                 fontSize: "12px",
-                color: "var(--text-secondary)",
+                color: "var(--crayon-secondary-text)",
                 marginBottom: "4px",
               }}
             >
@@ -152,7 +153,7 @@ export function StrokeControls({
             <div
               style={{
                 fontSize: "12px",
-                color: "var(--text-secondary)",
+                color: "var(--crayon-secondary-text)",
                 marginBottom: "4px",
               }}
             >
@@ -174,7 +175,7 @@ export function StrokeControls({
             <div
               style={{
                 fontSize: "12px",
-                color: "var(--text-secondary)",
+                color: "var(--crayon-secondary-text)",
                 marginBottom: "4px",
               }}
             >
@@ -195,5 +196,6 @@ export function StrokeControls({
         </div>
       </div>
     </Section>
+    </div>
   );
 }

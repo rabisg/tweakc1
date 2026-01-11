@@ -42,17 +42,18 @@ export function ShadowControls({
   };
 
   return (
-    <Section title="Shadow" defaultOpen={true}>
-      <div
-        style={{
-          marginBottom: "16px",
-          fontSize: "13px",
-          color: "var(--text-secondary)",
-        }}
-      >
-        Configure a base shadow. Small, Medium, Large, and XL shadows will be
-        auto-generated.
-      </div>
+    <div style={{ padding: "16px" }}>
+      <Section title="Shadow" defaultOpen={true}>
+        <div
+          style={{
+            marginBottom: "16px",
+            fontSize: "13px",
+            color: "var(--crayon-secondary-text)",
+          }}
+        >
+          Configure a base shadow. Small, Medium, Large, and XL shadows will be
+          auto-generated.
+        </div>
 
       <ColorPicker
         label="Shadow Color"
@@ -67,7 +68,7 @@ export function ShadowControls({
             fontSize: "14px",
             fontWeight: "400",
             marginBottom: "8px",
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
           }}
         >
           Shadow Opacity
@@ -97,10 +98,10 @@ export function ShadowControls({
                   width: "80px",
                   padding: "8px 12px",
                   fontSize: "14px",
-                  border: "1px solid var(--border-primary)",
+                  border: "1px solid var(--crayon-stroke-emphasis)",
                   borderRadius: "6px",
-                  background: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  background: "var(--crayon-background-fills)",
+                  color: "var(--crayon-primary-text)",
                   textAlign: "right",
                   outline: "none",
                 }}
@@ -117,7 +118,7 @@ export function ShadowControls({
             fontSize: "14px",
             fontWeight: "400",
             marginBottom: "8px",
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
           }}
         >
           Blur Radius
@@ -147,10 +148,10 @@ export function ShadowControls({
                   width: "80px",
                   padding: "8px 12px",
                   fontSize: "14px",
-                  border: "1px solid var(--border-primary)",
+                  border: "1px solid var(--crayon-stroke-emphasis)",
                   borderRadius: "6px",
-                  background: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  background: "var(--crayon-background-fills)",
+                  color: "var(--crayon-primary-text)",
                   textAlign: "right",
                   outline: "none",
                 }}
@@ -158,7 +159,7 @@ export function ShadowControls({
               <span
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-secondary)",
+                  color: "var(--crayon-secondary-text)",
                   minWidth: "30px",
                 }}
               >
@@ -176,7 +177,7 @@ export function ShadowControls({
             fontSize: "14px",
             fontWeight: "400",
             marginBottom: "8px",
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
           }}
         >
           Spread
@@ -206,10 +207,10 @@ export function ShadowControls({
                   width: "80px",
                   padding: "8px 12px",
                   fontSize: "14px",
-                  border: "1px solid var(--border-primary)",
+                  border: "1px solid var(--crayon-stroke-emphasis)",
                   borderRadius: "6px",
-                  background: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  background: "var(--crayon-background-fills)",
+                  color: "var(--crayon-primary-text)",
                   textAlign: "right",
                   outline: "none",
                 }}
@@ -217,7 +218,7 @@ export function ShadowControls({
               <span
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-secondary)",
+                  color: "var(--crayon-secondary-text)",
                   minWidth: "30px",
                 }}
               >
@@ -235,7 +236,7 @@ export function ShadowControls({
             fontSize: "14px",
             fontWeight: "400",
             marginBottom: "8px",
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
           }}
         >
           Offset X
@@ -265,10 +266,10 @@ export function ShadowControls({
                   width: "80px",
                   padding: "8px 12px",
                   fontSize: "14px",
-                  border: "1px solid var(--border-primary)",
+                  border: "1px solid var(--crayon-stroke-emphasis)",
                   borderRadius: "6px",
-                  background: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  background: "var(--crayon-background-fills)",
+                  color: "var(--crayon-primary-text)",
                   textAlign: "right",
                   outline: "none",
                 }}
@@ -276,7 +277,7 @@ export function ShadowControls({
               <span
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-secondary)",
+                  color: "var(--crayon-secondary-text)",
                   minWidth: "30px",
                 }}
               >
@@ -294,7 +295,7 @@ export function ShadowControls({
             fontSize: "14px",
             fontWeight: "400",
             marginBottom: "8px",
-            color: "var(--text-primary)",
+            color: "var(--crayon-primary-text)",
           }}
         >
           Offset Y
@@ -324,10 +325,10 @@ export function ShadowControls({
                   width: "80px",
                   padding: "8px 12px",
                   fontSize: "14px",
-                  border: "1px solid var(--border-primary)",
+                  border: "1px solid var(--crayon-stroke-emphasis)",
                   borderRadius: "6px",
-                  background: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  background: "var(--crayon-background-fills)",
+                  color: "var(--crayon-primary-text)",
                   textAlign: "right",
                   outline: "none",
                 }}
@@ -335,7 +336,7 @@ export function ShadowControls({
               <span
                 style={{
                   fontSize: "14px",
-                  color: "var(--text-secondary)",
+                  color: "var(--crayon-secondary-text)",
                   minWidth: "30px",
                 }}
               >
@@ -346,5 +347,6 @@ export function ShadowControls({
         />
       </div>
     </Section>
+    </div>
   );
 }

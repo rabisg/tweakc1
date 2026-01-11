@@ -13,7 +13,7 @@ export function Section({ title, children, defaultOpen = true }: SectionProps) {
   return (
     <div
       style={{
-        border: "1px solid var(--border-primary)",
+        border: "1px solid var(--crayon-stroke-emphasis)",
         borderRadius: "8px",
         marginBottom: "16px",
         overflow: "hidden",
@@ -32,7 +32,7 @@ export function Section({ title, children, defaultOpen = true }: SectionProps) {
           cursor: "pointer",
           fontSize: "16px",
           fontWeight: "500",
-          color: "var(--text-primary)",
+          color: "var(--crayon-primary-text)",
         }}
       >
         <span>{title}</span>
@@ -42,7 +42,7 @@ export function Section({ title, children, defaultOpen = true }: SectionProps) {
         <div
           style={{
             padding: "0 16px 16px 16px",
-            borderTop: "1px solid var(--border-primary)",
+            borderTop: "1px solid var(--crayon-stroke-emphasis)",
           }}
         >
           <div style={{ paddingTop: "16px" }}>{children}</div>

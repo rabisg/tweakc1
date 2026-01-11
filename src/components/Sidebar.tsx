@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@crayonai/react-ui";
 import { Sparkles } from "lucide-react";
-import { ThemeCustomization, ShadowConfig } from "../types/theme";
+import { ThemeCustomization, ShadowConfig, ThemeMode } from "../types/theme";
 import { ColorControls } from "./ColorControls";
 import { FontControls } from "./FontControls";
 import { SpacingControls } from "./SpacingControls";
@@ -15,6 +15,7 @@ interface SidebarProps {
   value: string;
   onValueChange: (value: string) => void;
   customization: ThemeCustomization;
+  currentMode: ThemeMode;
   onColorChange: (
     key: keyof ThemeCustomization["colors"],
     value?: string
@@ -41,7 +42,7 @@ interface SidebarProps {
   onBorderRadiusChange: (value?: number) => void;
   onPresetSelect: (presetName: string) => void;
   onReset: () => void;
-  onThemeGenerated: (theme: ThemeCustomization) => void;
+  onCurrentModeThemeGenerated: (theme: ThemeCustomization) => void;
   onCustomCssChange: (value?: string) => void;
 }
 
@@ -49,6 +50,7 @@ export function Sidebar({
   value,
   onValueChange,
   customization,
+  currentMode,
   onColorChange,
   onChartColorChange,
   onStrokeColorChange,
@@ -60,15 +62,14 @@ export function Sidebar({
   onBorderRadiusChange,
   onPresetSelect,
   onReset,
-  onThemeGenerated,
+  onCurrentModeThemeGenerated,
   onCustomCssChange,
 }: SidebarProps) {
   return (
     <aside
       className="w-140 overflow-y-auto flex flex-col"
       style={{
-        backgroundColor: "var(--bg-secondary)",
-        borderColor: "var(--border-primary)",
+        borderRight: "1px solid var(--crayon-stroke-emphasis)",
       }}
     >
       <PresetSelector
@@ -87,7 +88,8 @@ export function Sidebar({
         <TabsContent value="generate">
           <GenerateControls
             customization={customization}
-            onThemeGenerated={onThemeGenerated}
+            currentMode={currentMode}
+            onThemeGenerated={onCurrentModeThemeGenerated}
             onApiKeyChange={() => {}}
           />
         </TabsContent>

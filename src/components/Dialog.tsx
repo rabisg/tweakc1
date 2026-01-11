@@ -59,7 +59,7 @@ export function Dialog({
     >
       <div
         style={{
-          backgroundColor: "var(--bg-primary, white)",
+          backgroundColor: "var(--crayon-background-fills, white)",
           borderRadius: "8px",
           maxWidth: maxWidthMap[maxWidth],
           width: "90%",
@@ -78,7 +78,7 @@ export function Dialog({
               alignItems: "center",
               justifyContent: "space-between",
               padding: "16px 24px",
-              borderBottom: "1px solid var(--border-primary, #e5e7eb)",
+              borderBottom: "1px solid var(--crayon-stroke-emphasis, #e5e7eb)",
             }}
           >
             <h2 style={{ margin: 0, fontSize: "18px", fontWeight: "600" }}>
@@ -98,7 +98,7 @@ export function Dialog({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "var(--text-secondary, #6b7280)",
+                color: "var(--crayon-secondary-text, #6b7280)",
               }}
             >
               ×

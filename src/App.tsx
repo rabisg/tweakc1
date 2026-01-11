@@ -16,6 +16,7 @@ function App({ theme, setTheme }: AppProps) {
     customization,
     theme: customTheme,
     darkTheme: customDarkTheme,
+    currentMode,
     updateColor,
     updateChartColor,
     updateStrokeColor,
@@ -26,8 +27,8 @@ function App({ theme, setTheme }: AppProps) {
     updateSpacing,
     updateBorderRadius,
     updateCustomCss,
+    updateCurrentModeConfig,
     loadPreset,
-    setCustomization,
     undo,
     redo,
     canUndo,
@@ -35,7 +36,7 @@ function App({ theme, setTheme }: AppProps) {
     clear,
     exportThemeCode,
     getShareUrl,
-  } = useThemeCustomizer();
+  } = useThemeCustomizer(theme);
 
   return (
     <div className="w-screen h-screen flex flex-col">
@@ -55,6 +56,7 @@ function App({ theme, setTheme }: AppProps) {
           value={sidebarTab}
           onValueChange={setSidebarTab}
           customization={customization}
+          currentMode={currentMode}
           onColorChange={updateColor}
           onChartColorChange={updateChartColor}
           onStrokeColorChange={updateStrokeColor}
@@ -67,7 +69,7 @@ function App({ theme, setTheme }: AppProps) {
           onCustomCssChange={updateCustomCss}
           onPresetSelect={loadPreset}
           onReset={clear}
-          onThemeGenerated={setCustomization}
+          onCurrentModeThemeGenerated={updateCurrentModeConfig}
         />
         <MainPanel
           mode={theme}

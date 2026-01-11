@@ -1,5 +1,9 @@
 import OpenAI from "openai";
-import { ThemeCustomization, ThemeCustomizationSchema } from "../types/theme";
+import {
+  ThemeCustomization,
+  ThemeCustomizationSchema,
+  ThemeMode,
+} from "../types/theme";
 
 const THEME_SCHEMA = ThemeCustomizationSchema.toJSONSchema();
 
@@ -7,8 +11,10 @@ const SYSTEM_PROMPT = `You are a professional UI/UX theme designer. Generate the
 
 IMPORTANT: Only generate the fields that need to change based on the user's request. If the user asks for a specific change (like "make it sharp", "use blue", "darker background"), only modify those relevant fields. For completely new themes, generate all fields.
 
+You are generating for a specific mode (light or dark). Consider the mode when generating colors and contrast.
+
 Theme System Overview:
-- Colors: Use hex format (#RRGGBB). Consider light/dark mode compatibility.
+- Colors: Use hex format (#RRGGBB) or oklch format. Consider the mode (light/dark) for appropriate contrast and brightness.
 - Fonts: Use Google Fonts names (e.g., "Inter", "Roboto Mono", "Playfair Display")
 - Spacing: Multiplier from 0.5 (compact) to 2 (spacious), default 1
 - Border Radius (borderRadius.base): Number in rem from 0 (sharp/square corners) to 8 (very rounded), default 2. Common values: 0 (sharp), 1 (subtle), 2 (modern), 4 (rounded), 6-8 (very rounded)
@@ -64,22 +70,25 @@ function deepMerge(
 export async function generateThemeWithAI(
   apiKey: string,
   description: string,
-  currentTheme: ThemeCustomization
+  currentTheme: ThemeCustomization,
+  mode: ThemeMode
 ): Promise<ThemeCustomization> {
   const openai = new OpenAI({
     apiKey,
     dangerouslyAllowBrowser: true,
   });
 
-  const userPrompt = `Generate theme updates based on this description: "${description}"
+  const userPrompt = `Generate theme updates for ${mode} mode based on this description: "${description}"
 
-Current theme:
+Current ${mode} mode theme:
 ${JSON.stringify(currentTheme, null, 2)}
 
 Instructions:
+- You are generating for ${mode} mode specifically
 - If this is an incremental change (like "make it sharp", "darker", "use blue"), only provide the specific fields that need to change
 - If this is a complete theme request (like "retro terminal theme"), provide all fields
-- Only include fields that should be updated or are necessary for a complete theme`;
+- Only include fields that should be updated or are necessary for a complete theme
+- Ensure colors are appropriate for ${mode} mode (proper contrast and brightness)`;
 
   try {
     const completion = await openai.chat.completions.create({

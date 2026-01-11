@@ -49,9 +49,9 @@ export function CssOverrideControls({
             fontFamily: "monospace",
             fontSize: "13px",
             lineHeight: "1.5",
-            backgroundColor: "var(--bg-primary)",
-            color: "var(--text-primary)",
-            border: "1px solid var(--border-primary)",
+            backgroundColor: "var(--crayon-background-fills)",
+            color: "var(--crayon-primary-text)",
+            border: "1px solid var(--crayon-stroke-emphasis)",
             borderRadius: "4px",
             resize: "vertical",
           }}
@@ -60,7 +60,7 @@ export function CssOverrideControls({
           style={{
             marginTop: "8px",
             fontSize: "12px",
-            color: "var(--text-secondary)",
+            color: "var(--crayon-secondary-text)",
           }}
         >
           Write custom CSS to override theme styles. Changes apply immediately.

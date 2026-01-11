@@ -60,6 +60,16 @@ export const ThemeCustomizationSchema = z.object({
 export type ShadowConfig = z.infer<typeof ShadowConfigSchema>;
 export type ThemeCustomization = z.infer<typeof ThemeCustomizationSchema>;
 
+// Dual-mode theme customization
+export const DualModeThemeCustomizationSchema = z.object({
+  light: ThemeCustomizationSchema,
+  dark: ThemeCustomizationSchema,
+});
+
+export type DualModeThemeCustomization = z.infer<typeof DualModeThemeCustomizationSchema>;
+
+export type ThemeMode = "light" | "dark";
+
 // Future enhancements that could be added:
 // - Interactive state colors (neutral default/hover/pressed/disabled)
 // - Extended fill colors (overlay, sunk, elevated, inverted)

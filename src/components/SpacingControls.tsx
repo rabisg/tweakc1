@@ -56,7 +56,7 @@ export function SpacingControls({
               fontSize: "14px",
               fontWeight: "400",
               marginBottom: "8px",
-              color: "var(--text-primary)",
+              color: "var(--crayon-primary-text)",
             }}
           >
             Radius
@@ -87,10 +87,10 @@ export function SpacingControls({
                       width: "80px",
                       padding: "8px 12px",
                       fontSize: "14px",
-                      border: "1px solid var(--border-primary)",
+                      border: "1px solid var(--crayon-stroke-emphasis)",
                       borderRadius: "6px",
-                      background: "var(--bg-primary)",
-                      color: "var(--text-primary)",
+                      background: "var(--crayon-background-fills)",
+                      color: "var(--crayon-primary-text)",
                       textAlign: "right",
                       outline: "none",
                     }}
@@ -98,7 +98,7 @@ export function SpacingControls({
                   <span
                     style={{
                       fontSize: "14px",
-                      color: "var(--text-secondary)",
+                      color: "var(--crayon-secondary-text)",
                       minWidth: "30px",
                     }}
                   >
@@ -119,7 +119,7 @@ export function SpacingControls({
               fontSize: "14px",
               fontWeight: "400",
               marginBottom: "8px",
-              color: "var(--text-primary)",
+              color: "var(--crayon-primary-text)",
             }}
           >
             Base Spacing
@@ -150,10 +150,10 @@ export function SpacingControls({
                       width: "80px",
                       padding: "8px 12px",
                       fontSize: "14px",
-                      border: "1px solid var(--border-primary)",
+                      border: "1px solid var(--crayon-stroke-emphasis)",
                       borderRadius: "6px",
-                      background: "var(--bg-primary)",
-                      color: "var(--text-primary)",
+                      background: "var(--crayon-background-fills)",
+                      color: "var(--crayon-primary-text)",
                       textAlign: "right",
                       outline: "none",
                     }}
@@ -161,7 +161,7 @@ export function SpacingControls({
                   <span
                     style={{
                       fontSize: "14px",
-                      color: "var(--text-secondary)",
+                      color: "var(--crayon-secondary-text)",
                       minWidth: "30px",
                     }}
                   >

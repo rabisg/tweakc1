@@ -1,4 +1,4 @@
-import { ThemeCustomization } from "../types/theme";
+import { DualModeThemeCustomization } from "../types/theme";
 
 async function compressData(data: Uint8Array): Promise<Uint8Array> {
   const stream = new ReadableStream({
@@ -61,7 +61,7 @@ async function decompressData(data: Uint8Array): Promise<Uint8Array> {
 }
 
 export async function generateShareUrl(
-  state: ThemeCustomization,
+  state: DualModeThemeCustomization,
   baseUrl?: string
 ): Promise<string> {
   const json = JSON.stringify(state);
@@ -77,7 +77,7 @@ export async function generateShareUrl(
   return url.toString();
 }
 
-export async function loadStateFromUrl(): Promise<ThemeCustomization | null> {
+export async function loadStateFromUrl(): Promise<DualModeThemeCustomization | null> {
   const url = new URL(window.location.href);
   const encoded = url.searchParams.get("c");
 
@@ -96,7 +96,7 @@ export async function loadStateFromUrl(): Promise<ThemeCustomization | null> {
     const textDecoder = new TextDecoder();
     const json = textDecoder.decode(decompressed);
 
-    return JSON.parse(json) as ThemeCustomization;
+    return JSON.parse(json) as DualModeThemeCustomization;
   } catch (error) {
     console.error("Failed to load state from URL:", error);
     return null;

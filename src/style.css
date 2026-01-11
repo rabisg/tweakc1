@@ -9,32 +9,18 @@
 
   :root {
     /* Light theme colors */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f5f5f5;
-    --bg-tertiary: #e5e5e5;
-    --border-primary: #d4d4d4;
-    --text-primary: #171717;
-    --text-secondary: #737373;
-    --scrollbar-thumb: #d4d4d4;
-    --scrollbar-thumb-hover: #a3a3a3;
-  }
-
-  :root[data-theme="dark"] {
-    /* Dark theme colors */
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #141414;
-    --bg-tertiary: #1a1a1a;
-    --border-primary: #2a2a2a;
-    --text-primary: #ededed;
-    --text-secondary: #6a6a6a;
-    --scrollbar-thumb: #2a2a2a;
-    --scrollbar-thumb-hover: #3a3a3a;
+    --bg-primary: var(--crayon-background-fills);
+    --border-primary: var(--crayon-stroke-accent);
+    --text-primary: var(--crayon-primary-text);
+    --text-secondary: var(--crayon-secondary-text);
+    --scrollbar-thumb: var(--crayon-interactive-accent);
+    --scrollbar-thumb-hover: var(--crayon-interactive-accent-hover);
   }
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background: var(--crayon-chat-container-bg);
+    color: var(--crayon-primary-text);
     overflow: hidden;
   }
 
@@ -49,12 +35,12 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
+    background: var(--crayon-interactive-accent);
     border-radius: 4px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover);
+    background: var(--crayon-interactive-accent-hover);
   }
 
   /* Range slider styling */
@@ -66,7 +52,7 @@
   }
 
   input[type="range"]::-webkit-slider-track {
-    background: var(--border-primary);
+    background: var(--crayon-stroke-emphasis);
     height: 4px;
     border-radius: 2px;
   }
@@ -74,7 +60,7 @@
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    background: var(--text-primary);
+    background: var(--crayon-primary-text);
     height: 16px;
     width: 16px;
     border-radius: 50%;
@@ -83,13 +69,13 @@
   }
 
   input[type="range"]::-moz-range-track {
-    background: var(--border-primary);
+    background: var(--crayon-stroke-emphasis);
     height: 4px;
     border-radius: 2px;
   }
 
   input[type="range"]::-moz-range-thumb {
-    background: var(--text-primary);
+    background: var(--crayon-primary-text);
     height: 16px;
     width: 16px;
     border-radius: 50%;
