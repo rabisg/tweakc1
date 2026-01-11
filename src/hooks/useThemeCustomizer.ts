@@ -183,6 +183,17 @@ export function useThemeCustomizer() {
     [state, setState]
   );
 
+  // Update custom CSS
+  const updateCustomCss = useCallback(
+    (value?: string) => {
+      setState({
+        ...state,
+        customCss: value,
+      });
+    },
+    [state, setState]
+  );
+
   // Load preset
   const loadPreset = useCallback(
     (presetName: string) => {
@@ -201,8 +212,12 @@ export function useThemeCustomizer() {
 
   // Export theme code
   const exportThemeCode = useCallback(() => {
-    return generateThemeCode(generatedTheme.theme, generatedTheme.darkTheme);
-  }, [generatedTheme]);
+    return generateThemeCode(
+      generatedTheme.theme,
+      generatedTheme.darkTheme,
+      state.customCss
+    );
+  }, [generatedTheme, state.customCss]);
 
   // Generate share URL
   const getShareUrl = useCallback(async () => {
@@ -225,6 +240,7 @@ export function useThemeCustomizer() {
     updateStrokeColor,
     updateChatColor,
     updateShadow,
+    updateCustomCss,
     loadPreset,
     setCustomization: setState,
 

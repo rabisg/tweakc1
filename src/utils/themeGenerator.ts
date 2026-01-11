@@ -1,4 +1,4 @@
-import { ThemeCustomization, ColorEngine } from "../types/theme";
+import { ThemeCustomization, ColorEngine, ShadowConfig } from "../types/theme";
 import { colorEngines } from "./colorEngines";
 
 // Helper to parse rgba and extract RGB components
@@ -521,7 +521,8 @@ export function generateCompleteTheme(customization: ThemeCustomization): {
 // Generate TypeScript code for export
 export function generateThemeCode(
   theme?: Record<string, any>,
-  darkTheme?: Record<string, any>
+  darkTheme?: Record<string, any>,
+  customCss?: string
 ): string {
   if (!theme || !darkTheme) {
     return "export const customTheme = {\n  theme: {},\n  darkTheme: {}\n};";
@@ -544,6 +545,19 @@ export function generateThemeCode(
       .join(",\n");
   };
 
+  const customCssSection = customCss
+    ? `\n\nexport const customCss = \`${customCss}\`;
+
+// Apply custom CSS:
+// Add this to your component:
+// useEffect(() => {
+//   const style = document.createElement('style');
+//   style.textContent = customCss;
+//   document.head.appendChild(style);
+//   return () => style.remove();
+// }, []);`
+    : "";
+
   return `export const customTheme = {
   theme: {
 ${formatObject(theme)}
@@ -551,7 +565,7 @@ ${formatObject(theme)}
   darkTheme: {
 ${formatObject(darkTheme)}
   }
-};
+};${customCssSection}
 
 // Usage:
 // <ThemeProvider theme={customTheme.theme} darkTheme={customTheme.darkTheme}>

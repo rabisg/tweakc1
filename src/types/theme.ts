@@ -54,6 +54,7 @@ export const ThemeCustomizationSchema = z.object({
   borderRadius: z.object({
     base: z.number().min(0).max(8).optional(), // in rem, 0 (sharp) to 8 (very rounded)
   }),
+  customCss: z.string().optional(),
 });
 
 export type ShadowConfig = z.infer<typeof ShadowConfigSchema>;

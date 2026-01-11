@@ -25,6 +25,7 @@ function App({ theme, setTheme }: AppProps) {
     updateLetterSpacing,
     updateSpacing,
     updateBorderRadius,
+    updateCustomCss,
     loadPreset,
     setCustomization,
     undo,
@@ -63,6 +64,7 @@ function App({ theme, setTheme }: AppProps) {
           onLetterSpacingChange={updateLetterSpacing}
           onSpacingChange={updateSpacing}
           onBorderRadiusChange={updateBorderRadius}
+          onCustomCssChange={updateCustomCss}
           onPresetSelect={loadPreset}
           onReset={clear}
           onThemeGenerated={setCustomization}
@@ -71,6 +73,7 @@ function App({ theme, setTheme }: AppProps) {
           mode={theme}
           theme={customTheme}
           darkTheme={customDarkTheme}
+          customCss={customization.customCss}
         />
       </div>
     </div>

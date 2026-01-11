@@ -115,12 +115,14 @@ interface MainPanelProps {
   mode?: "light" | "dark";
   theme?: Record<string, any>;
   darkTheme?: Record<string, any>;
+  customCss?: string;
 }
 
 export function MainPanel({
   mode = "light",
   theme,
   darkTheme,
+  customCss,
 }: MainPanelProps) {
   const threadListManager = useThreadListManager({
     fetchThreadList: async () => {
@@ -172,6 +174,32 @@ export function MainPanel({
     threadListManager.selectedThreadId,
     threadListManager,
   ]);
+
+  // Inject custom CSS into document head
+  useEffect(() => {
+    const styleId = "custom-css-override";
+    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+
+    if (customCss) {
+      if (!styleElement) {
+        styleElement = document.createElement("style");
+        styleElement.id = styleId;
+        document.head.appendChild(styleElement);
+      }
+      styleElement.textContent = customCss;
+    } else {
+      if (styleElement) {
+        styleElement.remove();
+      }
+    }
+
+    return () => {
+      const el = document.getElementById(styleId);
+      if (el) {
+        el.remove();
+      }
+    };
+  }, [customCss]);
 
   return (
     <main className="flex-1 relative">

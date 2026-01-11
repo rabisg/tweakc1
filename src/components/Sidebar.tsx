@@ -9,6 +9,7 @@ import { ChatControls } from "./ChatControls";
 import { ShadowControls } from "./ShadowControls";
 import { PresetSelector } from "./PresetSelector";
 import { GenerateControls } from "./GenerateControls";
+import { CssOverrideControls } from "./CssOverrideControls";
 
 interface SidebarProps {
   value: string;
@@ -41,6 +42,7 @@ interface SidebarProps {
   onPresetSelect: (presetName: string) => void;
   onReset: () => void;
   onThemeGenerated: (theme: ThemeCustomization) => void;
+  onCustomCssChange: (value?: string) => void;
 }
 
 export function Sidebar({
@@ -59,6 +61,7 @@ export function Sidebar({
   onPresetSelect,
   onReset,
   onThemeGenerated,
+  onCustomCssChange,
 }: SidebarProps) {
   return (
     <aside
@@ -78,6 +81,7 @@ export function Sidebar({
           <TabsTrigger value="colors" text="Colors" />
           <TabsTrigger value="typography" text="Typography" />
           <TabsTrigger value="other" text="Other" />
+          <TabsTrigger value="css" text="CSS" />
           <TabsTrigger value="generate" text="Generate" icon={<Sparkles />} />
         </TabsList>
         <TabsContent value="generate">
@@ -121,6 +125,12 @@ export function Sidebar({
           <ShadowControls
             shadow={customization.shadow}
             onShadowChange={onShadowChange}
+          />
+        </TabsContent>
+        <TabsContent value="css">
+          <CssOverrideControls
+            customCss={customization.customCss}
+            onCustomCssChange={onCustomCssChange}
           />
         </TabsContent>
       </Tabs>
