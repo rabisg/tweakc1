@@ -1,22 +1,9 @@
 import { ThemeCustomization, ColorEngine, ShadowConfig } from "../types/theme";
 import { colorEngines } from "./colorEngines";
+import { parseColor } from "./colorParser";
 
-// Helper to parse rgba and extract RGB components
-function parseRGBA(rgba: string): {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-} {
-  const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
-  if (!match) return { r: 0, g: 0, b: 0, a: 1 };
-  return {
-    r: parseInt(match[1]),
-    g: parseInt(match[2]),
-    b: parseInt(match[3]),
-    a: match[4] ? parseFloat(match[4]) : 1,
-  };
-}
+// Alias for backwards compatibility
+const parseRGBA = parseColor;
 
 // Generate semantic colors using the selected engine
 export function generateSemanticColors(
@@ -228,15 +215,8 @@ function shadowConfigToString(shadow?: ShadowConfig): string | undefined {
   } = shadow;
 
   // Parse color and apply opacity
-  const colorMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  let finalColor = color;
-
-  if (colorMatch) {
-    const r = colorMatch[1];
-    const g = colorMatch[2];
-    const b = colorMatch[3];
-    finalColor = `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  }
+  const { r, g, b } = parseRGBA(color);
+  const finalColor = `rgba(${r},${g},${b},${opacity})`;
 
   // Omit spread if it's 0 (standard CSS allows this)
   if (spread === 0) {
@@ -284,14 +264,8 @@ export function generateShadows(
 
 // Helper to apply opacity to a color
 function applyOpacity(color: string, opacity: number): string {
-  const colorMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (colorMatch) {
-    const r = colorMatch[1];
-    const g = colorMatch[2];
-    const b = colorMatch[3];
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  }
-  return color;
+  const { r, g, b } = parseRGBA(color);
+  return `rgba(${r},${g},${b},${opacity})`;
 }
 
 // Generate stroke colors from base color and opacity
@@ -401,29 +375,33 @@ export function generateChartPalette(
 
   if (colors.length === 0) return [];
 
+  const targetCount = mode === "light" ? 10 : 11;
   const palette: string[] = [];
-  const opacities =
-    mode === "light"
-      ? [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.07]
-      : [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.14, 0.07];
 
-  // Generate variants for each base color
+  // Strategy: distribute colors evenly across opacity variations
+  const opacities =
+    mode === "light" ? [1, 0.8, 0.6, 0.4] : [1, 0.8, 0.6, 0.4, 0.2];
+
   colors.forEach((color) => {
     const { r, g, b } = parseRGBA(color);
-    // In dark mode, lighten the base colors slightly
+    // In dark mode, lighten the base colors slightly for better visibility
     const adjustedR = mode === "dark" ? Math.min(255, r + 20) : r;
     const adjustedG = mode === "dark" ? Math.min(255, g + 20) : g;
     const adjustedB = mode === "dark" ? Math.min(255, b + 20) : b;
 
-    opacities.forEach((opacity) => {
+    // Add color at different opacities
+    const numOpacities = Math.min(
+      opacities.length,
+      targetCount - palette.length
+    );
+    for (let i = 0; i < numOpacities && palette.length < targetCount; i++) {
       palette.push(
-        `rgba(${adjustedR}, ${adjustedG}, ${adjustedB}, ${opacity})`
+        `rgba(${adjustedR},${adjustedG},${adjustedB},${opacities[i]})`
       );
-    });
+    }
   });
 
-  // Return first 11 colors
-  return palette.slice(0, 11);
+  return palette;
 }
 
 // Generate complete theme for a single mode

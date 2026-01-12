@@ -1,27 +1,12 @@
 import { ColorEngine } from "../types/theme";
+import { parseColor } from "./colorParser";
 
-// Helper function to parse rgba string
-function parseRGBA(rgba: string): {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-} {
-  const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
-  if (!match) {
-    return { r: 0, g: 0, b: 0, a: 1 };
-  }
-  return {
-    r: parseInt(match[1]),
-    g: parseInt(match[2]),
-    b: parseInt(match[3]),
-    a: match[4] ? parseFloat(match[4]) : 1,
-  };
-}
+// Alias for backwards compatibility
+const parseRGBA = parseColor;
 
 // Helper function to create rgba string
 function toRGBA(r: number, g: number, b: number, a: number): string {
-  return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
+  return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`;
 }
 
 // Helper to darken color (for light mode)

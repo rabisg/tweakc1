@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
 import { ColorPickerProps } from "../types/theme";
+import { parseColor, toRGBA } from "../utils/colorParser";
 
-// Helper to convert rgba to hex
-function rgbaToHex(rgba: string): string {
-  const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-  if (!match) return "#000000";
-
-  const r = parseInt(match[1]);
-  const g = parseInt(match[2]);
-  const b = parseInt(match[3]);
-
+// Helper to convert any CSS color to hex
+function rgbaToHex(color: string): string {
+  const { r, g, b } = parseColor(color);
+  
   return (
     "#" +
     [r, g, b]
@@ -24,13 +20,13 @@ function rgbaToHex(rgba: string): string {
 // Helper to convert hex to rgba
 function hexToRgba(hex: string): string {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return "rgba(0, 0, 0, 1)";
+  if (!result) return "rgba(0,0,0,1)";
 
   const r = parseInt(result[1], 16);
   const g = parseInt(result[2], 16);
   const b = parseInt(result[3], 16);
 
-  return `rgba(${r}, ${g}, ${b}, 1)`;
+  return `rgba(${r},${g},${b},1)`;
 }
 
 // Validate if a color string is valid according to browser
