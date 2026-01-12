@@ -51,6 +51,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "Menlo",
         },
+        fontWeight: {},
         letterSpacing: {
           base: -0.011,
         },
@@ -103,6 +104,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "Menlo",
         },
+        fontWeight: {},
         letterSpacing: {
           base: -0.011,
         },
@@ -164,6 +166,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: 0,
         },
@@ -217,6 +220,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: 0,
         },
@@ -274,6 +278,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: -0.005,
         },
@@ -289,7 +294,7 @@ export const themePresets: Record<string, ThemePreset> = {
   border: 1px solid transparent;
   box-shadow: 0px 0px 8px -3px #000000;
 }
-.crayon-shell-thread-message-assistant__logo { display: none }
+.crayon-shell-thread-message-assistant__logo { visibility: hidden }
 .crayon-shell-sidebar-container {
     background: transparent;
     border-right: 1px solid oklch(0.60 0.11 40);
@@ -340,6 +345,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: -0.005,
         },
@@ -355,7 +361,7 @@ export const themePresets: Record<string, ThemePreset> = {
   border: 1px solid transparent;
   box-shadow: 0px 0px 8px -3px #000000;
 }
-.crayon-shell-thread-message-assistant__logo { display: none }
+.crayon-shell-thread-message-assistant__logo { visibility: hidden }
 .crayon-shell-sidebar-container {
     background: transparent;
     border-right: 1px solid oklch(0.60 0.11 40);
@@ -412,6 +418,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: 0,
         },
@@ -465,6 +472,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: 0,
         },
@@ -523,6 +531,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: 0,
         },
@@ -576,6 +585,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: 0,
         },
@@ -634,6 +644,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: -0.005,
         },
@@ -687,6 +698,7 @@ export const themePresets: Record<string, ThemePreset> = {
           heading: "Inter",
           mono: "JetBrains Mono",
         },
+        fontWeight: {},
         letterSpacing: {
           base: -0.005,
         },

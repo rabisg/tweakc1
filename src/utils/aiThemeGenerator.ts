@@ -61,6 +61,7 @@ function deepMerge(
     shadow: updates.shadow !== undefined ? updates.shadow : current.shadow,
     colorEngine: updates.colorEngine ?? current.colorEngine,
     fonts: { ...current.fonts, ...updates.fonts },
+    fontWeight: { ...current.fontWeight, ...updates.fontWeight },
     letterSpacing: { ...current.letterSpacing, ...updates.letterSpacing },
     spacing: { ...current.spacing, ...updates.spacing },
     borderRadius: { ...current.borderRadius, ...updates.borderRadius },

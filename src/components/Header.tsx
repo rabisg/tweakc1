@@ -70,7 +70,8 @@ export function Header({
       <header
         className="flex items-center justify-between p-2"
         style={{
-          borderBottom: "1px solid var(--crayon-stroke-emphasis)",
+          backgroundColor: "var(--bg-tertiary)",
+          borderColor: "var(--border-primary)",
         }}
       >
         <div className="flex items-center">
@@ -85,13 +86,6 @@ export function Header({
           <SwitchItem
             checked={theme === "dark"}
             onChange={(checked) => setTheme(checked ? "dark" : "light")}
-          />
-          <ActionButtons
-            onUndo={onUndo}
-            onRedo={onRedo}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            onReset={onReset}
           />
           <div className="flex items-center gap-1">
             <Button

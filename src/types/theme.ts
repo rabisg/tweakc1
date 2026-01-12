@@ -45,6 +45,9 @@ export const ThemeCustomizationSchema = z.object({
     heading: z.string().optional(),
     mono: z.string().optional(),
   }),
+  fontWeight: z.object({
+    scale: z.number().min(0.5).max(1.5).optional(), // multiplier for all font weights
+  }),
   letterSpacing: z.object({
     base: z.number().optional(), // in em units
   }),

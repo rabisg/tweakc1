@@ -103,51 +103,69 @@ export function generateSemanticColors(
 // Generate font variables
 export function generateFontVariables(
   fonts: ThemeCustomization["fonts"],
-  letterSpacing?: number
+  letterSpacing?: number,
+  fontWeightScale?: number
 ): Record<string, string> {
   const result: Record<string, string> = {};
+  const scale = fontWeightScale ?? 1;
 
-  if (fonts.body) {
-    result.fontBody = `375 16px/1.5 ${fonts.body}`;
-    result.fontBodyLink = `375 16px/1.5 ${fonts.body}`;
-    result.fontBodyHeavy = `450 16px/1.5 ${fonts.body}`;
-    result.fontBodyMedium = `375 16px/1.5 ${fonts.body}`;
-    result.fontBodySmall = `375 14px/1.5 ${fonts.body}`;
-    result.fontBodySmallHeavy = `450 14px/1.5 ${fonts.body}`;
-    result.fontBodyLarge = `375 18px/1.5 ${fonts.body}`;
-    result.fontBodyLargeHeavy = `450 18px/1.5 ${fonts.body}`;
-    result.fontLabel = `375 16px/1.2 ${fonts.body}`;
-    result.fontLabelHeavy = `450 16px/1.2 ${fonts.body}`;
-    result.fontLabelSmall = `375 14px/1.2 ${fonts.body}`;
-    result.fontLabelSmallHeavy = `450 14px/1.2 ${fonts.body}`;
-    result.fontLabelExtraSmall = `375 12px/1.2 ${fonts.body}`;
-    result.fontLabelExtraSmallHeavy = `450 12px/1.2 ${fonts.body}`;
-    result.fontLabelLarge = `375 18px/1.2 ${fonts.body}`;
-    result.fontLabelLargeHeavy = `450 18px/1.2 ${fonts.body}`;
-    result.fontLabelMedium = `375 16px/1.2 ${fonts.body}`;
-    result.fontLabelMediumHeavy = `450 16px/1.2 ${fonts.body}`;
-    result.fontLabel2ExtraSmall = `375 12px/1.2 ${fonts.body}`;
-    result.fontLabel2ExtraSmallHeavy = `450 12px/1.2 ${fonts.body}`;
+  // Default to Inter if no fonts specified
+  const bodyFont = fonts.body || "Inter";
+  const headingFont = fonts.heading || "Inter";
+  const monoFont = fonts.mono || "Menlo";
+
+  console.log("[generateFontVariables]", {
+    fontWeightScale,
+    scale,
+    bodyFont,
+    headingFont,
+    monoFont,
+  });
+
+  // Helper to scale font weight
+  const w = (baseWeight: number) => Math.round(baseWeight * scale);
+
+  if (bodyFont) {
+    result.fontBody = `${w(375)} 16px/1.5 ${bodyFont}`;
+    result.fontBodyLink = `${w(375)} 16px/1.5 ${bodyFont}`;
+    result.fontBodyHeavy = `${w(450)} 16px/1.5 ${bodyFont}`;
+    result.fontBodyMedium = `${w(375)} 16px/1.5 ${bodyFont}`;
+    result.fontBodySmall = `${w(375)} 14px/1.5 ${bodyFont}`;
+    result.fontBodySmallHeavy = `${w(450)} 14px/1.5 ${bodyFont}`;
+    result.fontBodyLarge = `${w(375)} 18px/1.5 ${bodyFont}`;
+    result.fontBodyLargeHeavy = `${w(450)} 18px/1.5 ${bodyFont}`;
+    result.fontLabel = `${w(375)} 16px/1.2 ${bodyFont}`;
+    result.fontLabelHeavy = `${w(450)} 16px/1.2 ${bodyFont}`;
+    result.fontLabelSmall = `${w(375)} 14px/1.2 ${bodyFont}`;
+    result.fontLabelSmallHeavy = `${w(450)} 14px/1.2 ${bodyFont}`;
+    result.fontLabelExtraSmall = `${w(375)} 12px/1.2 ${bodyFont}`;
+    result.fontLabelExtraSmallHeavy = `${w(450)} 12px/1.2 ${bodyFont}`;
+    result.fontLabelLarge = `${w(375)} 18px/1.2 ${bodyFont}`;
+    result.fontLabelLargeHeavy = `${w(450)} 18px/1.2 ${bodyFont}`;
+    result.fontLabelMedium = `${w(375)} 16px/1.2 ${bodyFont}`;
+    result.fontLabelMediumHeavy = `${w(450)} 16px/1.2 ${bodyFont}`;
+    result.fontLabel2ExtraSmall = `${w(375)} 12px/1.2 ${bodyFont}`;
+    result.fontLabel2ExtraSmallHeavy = `${w(450)} 12px/1.2 ${bodyFont}`;
   }
 
-  if (fonts.heading) {
-    result.fontHeadingLarge = `550 28px/1.15 ${fonts.heading}`;
-    result.fontHeadingMedium = `550 24px/1.15 ${fonts.heading}`;
-    result.fontHeadingSmall = `550 18px/1.25 ${fonts.heading}`;
-    result.fontHeadingExtraSmall = `550 16px/1.25 ${fonts.heading}`;
+  if (headingFont) {
+    result.fontHeadingLarge = `${w(550)} 28px/1.15 ${headingFont}`;
+    result.fontHeadingMedium = `${w(550)} 24px/1.15 ${headingFont}`;
+    result.fontHeadingSmall = `${w(550)} 18px/1.25 ${headingFont}`;
+    result.fontHeadingExtraSmall = `${w(550)} 16px/1.25 ${headingFont}`;
   }
 
-  if (fonts.mono) {
-    result.fontNumber = `375 16px/1.5 ${fonts.mono}`;
-    result.fontNumberHeavy = `450 16px/1.5 ${fonts.mono}`;
-    result.fontNumberSmall = `375 14px/1.5 ${fonts.mono}`;
-    result.fontNumberSmallHeavy = `450 14px/1.5 ${fonts.mono}`;
-    result.fontNumberExtraSmall = `375 12px/1.5 ${fonts.mono}`;
-    result.fontNumberExtraSmallHeavy = `450 12px/1.5 ${fonts.mono}`;
-    result.fontNumberLarge = `375 18px/1.5 ${fonts.mono}`;
-    result.fontNumberLargeHeavy = `450 18px/1.5 ${fonts.mono}`;
-    result.fontNumberTitle = `550 28px/1.5 ${fonts.mono}`;
-    result.fontNumberTitleMedium = `550 24px/1.5 ${fonts.mono}`;
+  if (monoFont) {
+    result.fontNumber = `${w(375)} 16px/1.5 ${monoFont}`;
+    result.fontNumberHeavy = `${w(450)} 16px/1.5 ${monoFont}`;
+    result.fontNumberSmall = `${w(375)} 14px/1.5 ${monoFont}`;
+    result.fontNumberSmallHeavy = `${w(450)} 14px/1.5 ${monoFont}`;
+    result.fontNumberExtraSmall = `${w(375)} 12px/1.5 ${monoFont}`;
+    result.fontNumberExtraSmallHeavy = `${w(450)} 12px/1.5 ${monoFont}`;
+    result.fontNumberLarge = `${w(375)} 18px/1.5 ${monoFont}`;
+    result.fontNumberLargeHeavy = `${w(450)} 18px/1.5 ${monoFont}`;
+    result.fontNumberTitle = `${w(550)} 28px/1.5 ${monoFont}`;
+    result.fontNumberTitleMedium = `${w(550)} 24px/1.5 ${monoFont}`;
   }
 
   // Add letter spacing
@@ -421,7 +439,8 @@ export function generateCompleteTheme(
   // Generate fonts
   const fonts = generateFontVariables(
     customization.fonts,
-    customization.letterSpacing.base
+    customization.letterSpacing.base,
+    customization.fontWeight.scale
   );
   Object.assign(theme, fonts);
 

@@ -25,6 +25,7 @@ const emptyThemeCustomization: ThemeCustomization = {
   chatColors: {},
   colorEngine: "default",
   fonts: {},
+  fontWeight: {},
   letterSpacing: {},
   spacing: {},
   borderRadius: {},
@@ -147,6 +148,27 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
           ...currentConfig,
           letterSpacing: {
             base: value,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Update font weight
+  const updateFontWeight = useCallback(
+    (value?: number) => {
+      console.log('[useThemeCustomizer] updateFontWeight called:', {
+        value,
+        currentMode,
+        before: currentConfig.fontWeight,
+      });
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          fontWeight: {
+            scale: value,
           },
         },
       });
@@ -303,6 +325,7 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
     updateChartColor,
     updateFont,
     updateLetterSpacing,
+    updateFontWeight,
     updateSpacing,
     updateBorderRadius,
     updateStrokeColor,

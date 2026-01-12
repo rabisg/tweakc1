@@ -38,6 +38,7 @@ interface SidebarProps {
     value?: string
   ) => void;
   onLetterSpacingChange: (value?: number) => void;
+  onFontWeightChange: (value?: number) => void;
   onSpacingChange: (value?: number) => void;
   onBorderRadiusChange: (value?: number) => void;
   onPresetSelect: (presetName: string) => void;
@@ -58,6 +59,7 @@ export function Sidebar({
   onShadowChange,
   onFontChange,
   onLetterSpacingChange,
+  onFontWeightChange,
   onSpacingChange,
   onBorderRadiusChange,
   onPresetSelect,
@@ -112,8 +114,10 @@ export function Sidebar({
         <TabsContent value="typography">
           <FontControls
             fonts={customization.fonts}
+            fontWeight={customization.fontWeight}
             letterSpacing={customization.letterSpacing}
             onFontChange={onFontChange}
+            onFontWeightChange={onFontWeightChange}
             onLetterSpacingChange={onLetterSpacingChange}
           />
         </TabsContent>
@@ -124,10 +128,10 @@ export function Sidebar({
             onSpacingChange={onSpacingChange}
             onBorderRadiusChange={onBorderRadiusChange}
           />
-          <ShadowControls
+          {/* <ShadowControls
             shadow={customization.shadow}
             onShadowChange={onShadowChange}
-          />
+          /> */}
         </TabsContent>
         <TabsContent value="css">
           <CssOverrideControls

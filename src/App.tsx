@@ -24,6 +24,7 @@ function App({ theme, setTheme }: AppProps) {
     updateShadow,
     updateFont,
     updateLetterSpacing,
+    updateFontWeight,
     updateSpacing,
     updateBorderRadius,
     updateCustomCss,
@@ -64,6 +65,7 @@ function App({ theme, setTheme }: AppProps) {
           onShadowChange={updateShadow}
           onFontChange={updateFont}
           onLetterSpacingChange={updateLetterSpacing}
+          onFontWeightChange={updateFontWeight}
           onSpacingChange={updateSpacing}
           onBorderRadiusChange={updateBorderRadius}
           onCustomCssChange={updateCustomCss}

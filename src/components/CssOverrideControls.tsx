@@ -6,27 +6,27 @@ interface CssOverrideControlsProps {
 }
 
 const DEFAULT_CSS = `/* Chat container */
-.c1-chat-container {
+.crayon-shell-container {
   /* your styles here */
 }
 
 /* User message bubble */
-.c1-user-message {
+.crayon-shell-thread-message-user {
   /* your styles here */
 }
 
 /* Assistant message bubble */
-.c1-assistant-message {
+.crayon-shell-thread-message-assistant {
   /* your styles here */
 }
 
 /* Input area */
-.c1-chat-input {
+.crayon-shell-thread-composer__input {
   /* your styles here */
 }
 
 /* Thread sidebar */
-.c1-thread-list {
+.crayon-shell-sidebar-container {
   /* your styles here */
 }`;
 

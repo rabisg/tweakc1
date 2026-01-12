@@ -16,11 +16,13 @@ import { getPopularFonts, loadFont } from "../utils/fontLoader";
 
 interface FontControlsProps {
   fonts: ThemeCustomization["fonts"];
+  fontWeight: ThemeCustomization["fontWeight"];
   letterSpacing: ThemeCustomization["letterSpacing"];
   onFontChange: (
     category: keyof ThemeCustomization["fonts"],
     value?: string
   ) => void;
+  onFontWeightChange: (value?: number) => void;
   onLetterSpacingChange: (value?: number) => void;
 }
 
@@ -177,11 +179,22 @@ function FontSelector({
 
 export function FontControls({
   fonts,
+  fontWeight,
   letterSpacing,
   onFontChange,
+  onFontWeightChange,
   onLetterSpacingChange,
 }: FontControlsProps) {
   const letterSpacingValue = letterSpacing.base ?? 0;
+  const fontWeightScale = fontWeight.scale ?? 1;
+
+  console.log('[FontControls] Render:', {
+    fonts,
+    fontWeight,
+    fontWeightScale,
+    letterSpacing,
+    letterSpacingValue,
+  });
 
   return (
     <div style={{ padding: "16px" }}>
@@ -207,6 +220,72 @@ export function FontControls({
           onChange={(value) => onFontChange("mono", value)}
           placeholder="Choose a monospace font..."
         />
+      </Section>
+
+      <Section title="Font Weight" defaultOpen={false}>
+        <div style={{ marginBottom: "16px" }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: "14px",
+              fontWeight: "400",
+              marginBottom: "8px",
+              color: "var(--crayon-primary-text)",
+            }}
+          >
+            Weight Scale
+          </label>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <Slider
+              variant="continuous"
+              min={0.5}
+              max={1.5}
+              step={0.05}
+              value={[fontWeightScale]}
+              onValueChange={(values) => {
+                console.log('[FontControls] Slider changed:', values[0]);
+                onFontWeightChange(values[0]);
+              }}
+              style={{ flex: 1 }}
+              rightContent={
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginLeft: "12px",
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={fontWeightScale.toFixed(2)}
+                    readOnly
+                    style={{
+                      width: "80px",
+                      padding: "8px 12px",
+                      fontSize: "14px",
+                      border: "1px solid var(--crayon-stroke-emphasis)",
+                      borderRadius: "6px",
+                      background: "var(--crayon-background-fills)",
+                      color: "var(--crayon-primary-text)",
+                      textAlign: "right",
+                      outline: "none",
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      color: "var(--crayon-secondary-text)",
+                      minWidth: "30px",
+                    }}
+                  >
+                    ×
+                  </span>
+                </div>
+              }
+            />
+          </div>
+        </div>
       </Section>
 
       <Section title="Letter Spacing" defaultOpen={false}>
