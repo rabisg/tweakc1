@@ -52,6 +52,19 @@ function isValidColor(color: string): boolean {
   return tempElement.style.color !== "";
 }
 
+// Convert any valid CSS color (including named colors) to rgba format
+function normalizeColorToRgba(color: string): string {
+  if (!color) return "";
+  
+  try {
+    // Use parseColor to handle all color formats including named colors
+    const { r, g, b, a } = parseColor(color);
+    return `rgba(${r},${g},${b},${a})`;
+  } catch {
+    return color; // Return as-is if parsing fails
+  }
+}
+
 // Format color for display (shorten if possible)
 function formatColorDisplay(color: string): string {
   if (!color) return "";
@@ -72,10 +85,9 @@ export function ColorPicker({
   cssVariable,
   mode = "dark",
 }: ExtendedColorPickerProps) {
-  const [inputValue, setInputValue] = useState(value || "");
   const [isValid, setIsValid] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  const [localValue, setLocalValue] = useState("");
 
   // Get the default color for this CSS variable and mode
   const defaultColor = cssVariable ? getDefaultColor(cssVariable, mode) : "";
@@ -83,52 +95,67 @@ export function ColorPicker({
   // The effective value to display (custom value or default)
   const effectiveValue = value || defaultColor;
   const hexValue = effectiveValue ? rgbaToHex(effectiveValue) : "#000000";
-  const displayValue = value ? formatColorDisplay(inputValue) : formatColorDisplay(defaultColor);
 
-  // Sync input value when external value changes
+  // Sync local value when external value changes (and not focused)
   useEffect(() => {
-    if (value !== inputValue && isValid) {
-      setInputValue(value || "");
+    if (!isFocused) {
+      setLocalValue(value || "");
     }
-  }, [value, isValid]);
+  }, [value, isFocused]);
 
   const handleTextChange = (newValue: string) => {
-    setInputValue(newValue);
-    setIsTyping(true);
-
-    // Empty string means reset/clear the color
-    if (newValue.trim() === "") {
-      setIsValid(true);
-      onChange(undefined as any); // Reset to undefined
-    } else if (isValidColor(newValue)) {
-      setIsValid(true);
-      onChange(newValue);
-    } else {
-      setIsValid(false);
-    }
+    setLocalValue(newValue);
+    // Clear any previous error state while typing
+    setIsValid(true);
   };
 
   const handleFocus = () => {
     setIsFocused(true);
-    setIsTyping(false);
+    // When focusing, show the current value (or empty to type fresh)
+    setLocalValue(value || "");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.currentTarget.blur(); // Trigger blur to validate and apply
+    }
   };
 
   const handleBlur = () => {
     setIsFocused(false);
-    setIsTyping(false);
-    // Reset to last valid value on blur if invalid
-    if (!isValid) {
-      setInputValue(value || "");
+    
+    const trimmedValue = localValue.trim();
+    
+    // Empty string means reset/clear the color
+    if (trimmedValue === "") {
       setIsValid(true);
+      onChange(undefined as any); // Reset to undefined
+      setLocalValue("");
+    } else if (isValidColor(trimmedValue)) {
+      setIsValid(true);
+      // Normalize to rgba format for consistency (handles named colors like "red", "blue", etc.)
+      const normalizedColor = normalizeColorToRgba(trimmedValue);
+      onChange(normalizedColor);
+      setLocalValue(normalizedColor);
+    } else {
+      // Invalid color - show error and reset to last valid value
+      setIsValid(false);
+      setTimeout(() => {
+        setLocalValue(value || "");
+        setIsValid(true);
+      }, 1500); // Show error for 1.5 seconds before resetting
     }
   };
+
+  // Determine what to show in the input
+  const displayValue = isFocused 
+    ? localValue 
+    : (value ? formatColorDisplay(value) : formatColorDisplay(defaultColor));
 
   let inputClassName = "color-picker__input";
   
   if (!isValid) {
     inputClassName += " color-picker__input--error";
-  } else if (isTyping) {
-    inputClassName += " color-picker__input--typing";
   } else if (isFocused) {
     inputClassName += " color-picker__input--active";
   } else if (effectiveValue) {
@@ -147,12 +174,13 @@ export function ColorPicker({
         <div className="color-picker__input-wrapper">
           <input
             type="text"
-            value={value ? formatColorDisplay(inputValue) : displayValue}
+            value={displayValue}
             onChange={(e) => handleTextChange(e.target.value)}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
             disabled={disabled}
-            placeholder="rgba(0,0,0,0.5)"
+            placeholder="rgba(0,0,0,0.5) or red, blue..."
             className={inputClassName}
           />
           {!isValid && (
@@ -166,7 +194,7 @@ export function ColorPicker({
             onChange={(e) => {
               const rgbaColor = hexToRgba(e.target.value);
               onChange(rgbaColor);
-              setInputValue(rgbaColor);
+              setLocalValue(rgbaColor);
               setIsValid(true);
             }}
             disabled={disabled}

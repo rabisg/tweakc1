@@ -392,8 +392,14 @@
 }
 
 .slider-row__input--custom {
-  border-color: var(--crayon-primary-fills);
-  background: var(--crayon-background-tertiary);
+  border-color: var(--crayon-stroke-interactive-el);
+  background: var(--crayon-background-highlight-subtle);
+}
+
+.slider-row__input:focus,
+.slider-row__input--active {
+  border-color: var(--crayon-stroke-interactive-el-selected);
+  outline: none;
 }
 
 .slider-row__input::-webkit-outer-spin-button,
