@@ -13,6 +13,8 @@ interface SidebarProps {
   onValueChange: (value: string) => void;
   customization: ThemeCustomization;
   currentMode: ThemeMode;
+  currentPreset: string;
+  onPresetChange: (preset: string) => void;
   onColorChange: (
     key: keyof ThemeCustomization["colors"],
     value?: string
@@ -72,6 +74,8 @@ export function Sidebar({
   onValueChange,
   customization,
   currentMode,
+  currentPreset,
+  onPresetChange,
   onColorChange: _onColorChange,
   onFillChange,
   onTextChange,
@@ -101,6 +105,8 @@ export function Sidebar({
         onPresetSelect={onPresetSelect}
         onReset={onReset}
         customization={customization}
+        currentPreset={currentPreset}
+        onPresetChange={onPresetChange}
       />
 
       <div className="custom-tabs">
@@ -187,6 +193,7 @@ export function Sidebar({
               onIndividualBorderRadiusChange={onIndividualBorderRadiusChange}
               onApplyBorderRadiusPreset={onApplyBorderRadiusPreset}
               onApplySpacingPreset={onApplySpacingPreset}
+              currentPreset={currentPreset}
             />
           )}
 

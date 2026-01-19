@@ -13,6 +13,7 @@ interface AppProps {
 function App({ theme, setTheme }: AppProps) {
   const [sidebarTab, setSidebarTab] = useState("colors");
   const [selectorMode, setSelectorMode] = useState(false);
+  const [currentPreset, setCurrentPreset] = useState("default");
 
   const {
     customization,
@@ -90,6 +91,8 @@ function App({ theme, setTheme }: AppProps) {
           onValueChange={setSidebarTab}
           customization={customization}
           currentMode={currentMode}
+          currentPreset={currentPreset}
+          onPresetChange={setCurrentPreset}
           onColorChange={updateColor}
           onFillChange={updateFill}
           onTextChange={updateText}

@@ -12,6 +12,7 @@ interface SpacingControlsProps {
   onIndividualBorderRadiusChange: (key: string, value?: number) => void;
   onApplyBorderRadiusPreset: (values: Record<string, number>) => void;
   onApplySpacingPreset: (values: Record<string, number>) => void;
+  currentPreset: string;
 }
 
 // Spacing presets (5 discrete presets: Compact -> Tight -> Default -> Relaxed -> Spacious)
@@ -348,9 +349,22 @@ export function SpacingControls({
   onIndividualBorderRadiusChange,
   onApplyBorderRadiusPreset,
   onApplySpacingPreset,
+  currentPreset,
 }: SpacingControlsProps) {
-  const [radiusTabMode, setRadiusTabMode] = useState<"custom" | "preset">("custom");
-  const [spacingTabMode, setSpacingTabMode] = useState<"custom" | "preset">("custom");
+  const isDefaultTheme = currentPreset === "default";
+  
+  // For default theme: start with preset tab, for others: start with custom tab
+  const [radiusTabMode, setRadiusTabMode] = useState<"custom" | "preset">(
+    isDefaultTheme ? "preset" : "custom"
+  );
+  // Spacing: always start with preset tab for all themes
+  const [spacingTabMode, setSpacingTabMode] = useState<"custom" | "preset">("preset");
+  
+  // Store original theme borderRadius values to restore when switching back to custom
+  const [originalBorderRadius, setOriginalBorderRadius] = useState<typeof borderRadius>({});
+  
+  // Track previous preset to detect changes
+  const [prevPreset, setPrevPreset] = useState(currentPreset);
 
   // Find current radius preset index by checking if borderRadius values match a preset
   const findRadiusPresetIndex = () => {
@@ -382,11 +396,81 @@ export function SpacingControls({
   const radiusIndex = findRadiusPresetIndex();
   const spacingIndex = findSpacingPresetIndex();
 
+  // Initialize default theme with Medium preset on mount
+  useEffect(() => {
+    if (isDefaultTheme && Object.keys(borderRadius).length === 0) {
+      const mediumPreset = RADIUS_PRESETS[2]; // Medium is at index 2
+      onApplyBorderRadiusPreset(mediumPreset.values);
+    }
+    // Initialize spacing with Medium preset if empty (for all themes)
+    if (Object.keys(spacing).length === 0) {
+      const mediumSpacingPreset = SPACING_PRESETS[2]; // Default is at index 2
+      onApplySpacingPreset(mediumSpacingPreset.values);
+    }
+  }, []); // Only run on mount
+
+  // When preset changes, update tab mode and store original values
+  useEffect(() => {
+    if (currentPreset !== prevPreset) {
+      setPrevPreset(currentPreset);
+      const newIsDefault = currentPreset === "default";
+      
+      if (newIsDefault) {
+        // Switching to default theme: use preset tab
+        setRadiusTabMode("preset");
+        // Apply Medium preset if borderRadius is empty
+        if (Object.keys(borderRadius).length === 0) {
+          const mediumPreset = RADIUS_PRESETS[2];
+          onApplyBorderRadiusPreset(mediumPreset.values);
+        }
+      } else {
+        // Switching to a preset theme: use custom tab and store values
+        setRadiusTabMode("custom");
+        setOriginalBorderRadius({ ...borderRadius });
+      }
+    }
+  }, [currentPreset, prevPreset, borderRadius, onApplyBorderRadiusPreset]);
+
+  // Handle tab mode change for radius
+  const handleRadiusTabChange = (newMode: "custom" | "preset") => {
+    if (newMode === "custom" && radiusTabMode === "preset") {
+      // Switching from preset to custom
+      if (isDefaultTheme) {
+        // For default theme: copy current preset values
+        const currentPresetValues = RADIUS_PRESETS[radiusIndex].values;
+        onApplyBorderRadiusPreset(currentPresetValues);
+      } else {
+        // For other themes: restore original values
+        if (Object.keys(originalBorderRadius).length > 0) {
+          onApplyBorderRadiusPreset(originalBorderRadius as Record<string, number>);
+        }
+      }
+    } else if (newMode === "preset" && radiusTabMode === "custom") {
+      // Switching from custom to preset
+      if (!isDefaultTheme) {
+        // For non-default themes: apply Medium preset
+        const mediumPreset = RADIUS_PRESETS[2];
+        onApplyBorderRadiusPreset(mediumPreset.values);
+      }
+    }
+    setRadiusTabMode(newMode);
+  };
+
+  // Handle tab mode change for spacing (simpler: all themes use preset by default)
+  const handleSpacingTabChange = (newMode: "custom" | "preset") => {
+    if (newMode === "custom" && spacingTabMode === "preset") {
+      // Switching from preset to custom: copy current preset values
+      const currentPresetValues = SPACING_PRESETS[spacingIndex].values;
+      onApplySpacingPreset(currentPresetValues);
+    }
+    setSpacingTabMode(newMode);
+  };
+
   return (
     <>
       <Section title="Border Radius" defaultOpen={true}>
         {/* Custom/Preset Toggle */}
-        <Tabs value={radiusTabMode} onValueChange={(value) => setRadiusTabMode(value as "custom" | "preset")} variant="card">
+        <Tabs value={radiusTabMode} onValueChange={(value) => handleRadiusTabChange(value as "custom" | "preset")} variant="card">
           <TabsList>
             <TabsTrigger value="custom" text="Custom" />
             <TabsTrigger value="preset" text="Preset" />
@@ -445,7 +529,7 @@ export function SpacingControls({
 
       <Section title="Spacing" defaultOpen={false}>
         {/* Custom/Preset Toggle */}
-        <Tabs value={spacingTabMode} onValueChange={(value) => setSpacingTabMode(value as "custom" | "preset")} variant="card">
+        <Tabs value={spacingTabMode} onValueChange={(value) => handleSpacingTabChange(value as "custom" | "preset")} variant="card">
           <TabsList>
             <TabsTrigger value="custom" text="Custom" />
             <TabsTrigger value="preset" text="Preset" />

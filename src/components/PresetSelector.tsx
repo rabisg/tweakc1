@@ -15,14 +15,17 @@ interface PresetSelectorProps {
   onPresetSelect: (presetName: string) => void;
   onReset: () => void;
   customization: ThemeCustomization;
+  currentPreset: string;
+  onPresetChange: (preset: string) => void;
 }
 
 export function PresetSelector({
   onPresetSelect,
   onReset,
   customization,
+  currentPreset,
+  onPresetChange,
 }: PresetSelectorProps) {
-  const [selectedPreset, setSelectedPreset] = useState("default");
   const presetNames = getPresetNames();
 
   // Reset to "default" when all customization is cleared
@@ -38,12 +41,12 @@ export function PresetSelector({
       !customization.borderRadius.base;
 
     if (isEmpty) {
-      setSelectedPreset("default");
+      onPresetChange("default");
     }
-  }, [customization]);
+  }, [customization, onPresetChange]);
 
   const handleChange = async (value: string) => {
-    setSelectedPreset(value);
+    onPresetChange(value);
     
     // Load theme CSS
     try {
@@ -62,7 +65,7 @@ export function PresetSelector({
 
   return (
     <div className="preset-selector">
-      <Select value={selectedPreset} onValueChange={handleChange}>
+      <Select value={currentPreset} onValueChange={handleChange}>
         <SelectTrigger size="md" style={{ width: "100%" }}>
           <SelectValue placeholder="Select a preset..." />
         </SelectTrigger>
