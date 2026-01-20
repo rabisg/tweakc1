@@ -40,7 +40,10 @@ const initialState: DualModeThemeCustomization = {
   dark: { ...emptyThemeCustomization },
 };
 
-export function useThemeCustomizer(displayMode: ThemeMode) {
+export function useThemeCustomizer(
+  displayMode: ThemeMode,
+  onThemeModeLoaded?: (mode: ThemeMode) => void
+) {
   const { state, setState, undo, redo, canUndo, canRedo, clear } =
     useHistory<DualModeThemeCustomization>(initialState);
 
@@ -54,6 +57,10 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
       if (loadedState) {
         setState(loadedState);
         clearUrlState();
+        // If the loaded state has a currentMode, notify the parent to switch to it
+        if (loadedState.currentMode && onThemeModeLoaded) {
+          onThemeModeLoaded(loadedState.currentMode);
+        }
       }
     });
   }, []);
@@ -458,8 +465,8 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
 
   // Generate share URL
   const getShareUrl = useCallback(async () => {
-    return await generateShareUrl(state);
-  }, [state]);
+    return await generateShareUrl(state, currentMode);
+  }, [state, currentMode]);
 
   return {
     // State

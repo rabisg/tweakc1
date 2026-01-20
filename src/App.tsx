@@ -15,6 +15,10 @@ function App({ theme, setTheme }: AppProps) {
   const [selectorMode, setSelectorMode] = useState(false);
   const [currentPreset, setCurrentPreset] = useState("default");
 
+  const handleThemeModeLoaded = useCallback((mode: "light" | "dark") => {
+    setTheme(mode);
+  }, [setTheme]);
+
   const {
     customization,
     theme: customTheme,
@@ -48,7 +52,7 @@ function App({ theme, setTheme }: AppProps) {
     clear,
     exportThemeCode,
     getShareUrl,
-  } = useThemeCustomizer(theme);
+  } = useThemeCustomizer(theme, handleThemeModeLoaded);
 
   const handleAddToCss = useCallback(
     (selector: string) => {

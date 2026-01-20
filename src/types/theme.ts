@@ -163,6 +163,7 @@ export type ThemeCustomization = z.infer<typeof ThemeCustomizationSchema>;
 export const DualModeThemeCustomizationSchema = z.object({
   light: ThemeCustomizationSchema,
   dark: ThemeCustomizationSchema,
+  currentMode: z.enum(["light", "dark"]).optional(), // Track which mode was active when shared
 });
 
 export type DualModeThemeCustomization = z.infer<typeof DualModeThemeCustomizationSchema>;

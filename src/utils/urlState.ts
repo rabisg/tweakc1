@@ -62,9 +62,16 @@ async function decompressData(data: Uint8Array): Promise<Uint8Array> {
 
 export async function generateShareUrl(
   state: DualModeThemeCustomization,
+  currentMode: "light" | "dark",
   baseUrl?: string
 ): Promise<string> {
-  const json = JSON.stringify(state);
+  // Include the current mode in the shared state
+  const stateWithMode = {
+    ...state,
+    currentMode,
+  };
+  
+  const json = JSON.stringify(stateWithMode);
   const textEncoder = new TextEncoder();
   const data = textEncoder.encode(json);
 
