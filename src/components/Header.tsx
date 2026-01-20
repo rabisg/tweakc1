@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Button, SwitchItem } from "@crayonai/react-ui";
-import { Sparkles, MessageCircle, Share2, Code2 } from "lucide-react";
+import { Button, IconButton, SwitchItem, Tabs, TabsList, TabsTrigger } from "@crayonai/react-ui";
+import { Undo2, Redo2, RotateCcw, Upload, Code2 } from "lucide-react";
 import { toast } from "sonner";
 import { ExportModal } from "./ExportModal";
-import { ActionButtons } from "./ActionButtons";
+import "./Header.css";
 
 interface HeaderProps {
   theme: "light" | "dark";
@@ -15,6 +15,8 @@ interface HeaderProps {
   onExport: () => string;
   onReset: () => void;
   onShare: () => Promise<string>;
+  selectorMode: boolean;
+  onToggleSelectorMode: () => void;
 }
 
 export function Header({
@@ -27,6 +29,8 @@ export function Header({
   onExport,
   onReset,
   onShare,
+  selectorMode,
+  onToggleSelectorMode,
 }: HeaderProps) {
   const [showExportModal, setShowExportModal] = useState(false);
   const [themeCode, setThemeCode] = useState("");
@@ -67,54 +71,75 @@ export function Header({
 
   return (
     <>
-      <header
-        className="flex items-center justify-between p-2"
-        style={{
-          backgroundColor: "var(--bg-tertiary)",
-          borderColor: "var(--border-primary)",
-        }}
-      >
-        <div className="flex items-center gap-4">
-          <div className="flex items-center">
-            <span className="flex items-center justify-center">
-              <Sparkles size={16} />
-            </span>
-            tweakc1
-          </div>
+      <header className="header">
+        {/* Left side - Logo */}
+        <div className="header__left">
+          <span className="header__logo">TweakC1</span>
         </div>
-        <div className="flex items-center">
-          <SwitchItem
-            checked={theme === "dark"}
-            onChange={(checked) => setTheme(checked ? "dark" : "light")}
-          />
 
-          <ActionButtons
-            onUndo={onUndo}
-            onRedo={onRedo}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            onReset={onReset}
-          />
-          <div className="flex items-center gap-1">
+        {/* Right side - Controls */}
+        <div className="header__right">
+          {/* Selector Toggle */}
+          <div className="header__selector-toggle">
+            <span className="header__selector-label">Selector</span>
+            <SwitchItem className="header__selector-switch"
+              checked={selectorMode}
+              onChange={onToggleSelectorMode}
+            />
+          </div>
+
+          {/* Light/Dark Toggle - Tabs with card variant */}
+          <Tabs value={theme} onValueChange={(value) => setTheme(value as "light" | "dark")} variant="card">
+            <TabsList>
+              <TabsTrigger value="light" text="Light" />
+              <TabsTrigger value="dark" text="Dark" />
+            </TabsList>
+          </Tabs>
+
+          {/* Undo/Redo/Reset */}
+          <div className="header__actions">
+            <IconButton
+              icon={<RotateCcw size={16} />}
+              variant="secondary"
+              onClick={onReset}
+              title="Reset"
+            />
+            <IconButton
+              icon={<Undo2 size={16} />}
+              variant="secondary"
+              onClick={onUndo}
+              disabled={!canUndo}
+              title="Undo"
+            />
+            <IconButton
+              icon={<Redo2 size={16} />}
+              variant="secondary"
+              onClick={onRedo}
+              disabled={!canRedo}
+              title="Redo"
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="header__buttons">
             <Button
-              variant="tertiary"
-              iconLeft={<MessageCircle size={16} />}
+              variant="secondary"
               onClick={() =>
                 window.open("https://discord.com/invite/Pbv5PsqUSv", "_blank")
               }
             >
-              Discord
+              Join discord
             </Button>
             <Button
-              variant="tertiary"
-              iconLeft={<Share2 size={16} />}
+              variant="secondary"
+              iconRight={<Upload size={14} />}
               onClick={handleShare}
             >
               Share
             </Button>
             <Button
               variant="primary"
-              iconLeft={<Code2 size={16} />}
+              iconLeft={<Code2 size={14} />}
               onClick={handleExport}
             >
               Export

@@ -1,51 +1,31 @@
 import { ReactNode, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 interface SectionProps {
   title: string;
   children: ReactNode;
   defaultOpen?: boolean;
+  fullHeight?: boolean;
 }
 
-export function Section({ title, children, defaultOpen = true }: SectionProps) {
+export function Section({ title, children, defaultOpen = true, fullHeight = false }: SectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div
-      style={{
-        border: "1px solid var(--crayon-stroke-emphasis)",
-        borderRadius: "8px",
-        marginBottom: "16px",
-        overflow: "hidden",
-      }}
-    >
+    <div className={`section ${fullHeight ? "section--full-height" : ""}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          width: "100%",
-          padding: "16px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          fontSize: "16px",
-          fontWeight: "500",
-          color: "var(--crayon-primary-text)",
-        }}
+        className="section__header"
       >
         <span>{title}</span>
-        {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        <ChevronDown
+          size={18}
+          className={`section__icon ${isOpen ? "section__icon--open" : ""}`}
+        />
       </button>
       {isOpen && (
-        <div
-          style={{
-            padding: "0 16px 16px 16px",
-            borderTop: "1px solid var(--crayon-stroke-emphasis)",
-          }}
-        >
-          <div style={{ paddingTop: "16px" }}>{children}</div>
+        <div className="section__content">
+          {children}
         </div>
       )}
     </div>

@@ -18,20 +18,20 @@ Theme System Overview:
 - Fonts: Use Google Fonts names (e.g., "Inter", "Roboto Mono", "Playfair Display")
 - Spacing: Multiplier from 0.5 (compact) to 2 (spacious), default 1
 - Border Radius (borderRadius.base): Number in rem from 0 (sharp/square corners) to 8 (very rounded), default 2. Common values: 0 (sharp), 1 (subtle), 2 (modern), 4 (rounded), 6-8 (very rounded)
-- Stroke/Border Visibility (strokeColors.opacity): Number from 0 (invisible borders) to 1 (fully visible borders)
+- Stroke Colors: Individual stroke colors (default, interactiveEl, interactiveElHover, emphasis, accent). Use rgba format with opacity included (e.g., "rgba(0,0,0,0.2)")
 - Letter Spacing: Number in em units. Negative for tighter, positive for looser. Range: -0.05 to 0.2
 - Shadows: Configure color, opacity, blur, spread, and offset
 - Color Engine: Always use "default"
 
 Terminology Guide:
-- "remove borders" / "no borders" → set strokeColors.opacity to 0
+- "remove borders" / "no borders" → set strokeColors.default to "transparent"
 - "sharp corners" / "no rounded corners" / "square" → set borderRadius.base to 0
 - "more rounded" / "rounder corners" → increase borderRadius.base
-- "subtle borders" → set strokeColors.opacity to 0.1-0.3
+- "subtle borders" → set strokeColors.default to a low-opacity color like "rgba(0,0,0,0.1)"
 
 Examples:
 - "make it sharp" → only update borderRadius.base to 0
-- "remove all borders" → only update strokeColors.opacity to 0
+- "remove all borders" → only update strokeColors.default to "transparent"
 - "no rounded corners" → only update borderRadius.base to 0
 - "use a blue primary color" → only update colors.primary
 - "darker background" → only update colors.background
@@ -63,6 +63,7 @@ function deepMerge(
     fonts: { ...current.fonts, ...updates.fonts },
     fontWeight: { ...current.fontWeight, ...updates.fontWeight },
     letterSpacing: { ...current.letterSpacing, ...updates.letterSpacing },
+    fontSize: { ...current.fontSize, ...updates.fontSize },
     spacing: { ...current.spacing, ...updates.spacing },
     borderRadius: { ...current.borderRadius, ...updates.borderRadius },
   };

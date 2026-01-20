@@ -1,4 +1,7 @@
 import { Section } from "./Section";
+import CodeMirror from "@uiw/react-codemirror";
+import { css } from "@codemirror/lang-css";
+import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 
 interface CssOverrideControlsProps {
   customCss?: string;
@@ -37,32 +40,39 @@ export function CssOverrideControls({
   const cssValue = customCss !== undefined ? customCss : DEFAULT_CSS;
 
   return (
-    <Section title="Custom CSS">
-      <div style={{ marginTop: "8px" }}>
-        <textarea
+    <Section title="Custom CSS" fullHeight>
+      <div className="css-override-container">
+        <CodeMirror
           value={cssValue}
-          onChange={(e) => onCustomCssChange(e.target.value || undefined)}
-          style={{
-            width: "100%",
-            minHeight: "400px",
-            padding: "12px",
-            fontFamily: "monospace",
-            fontSize: "13px",
-            lineHeight: "1.5",
-            backgroundColor: "var(--crayon-background-fills)",
-            color: "var(--crayon-primary-text)",
-            border: "1px solid var(--crayon-stroke-emphasis)",
-            borderRadius: "4px",
-            resize: "vertical",
+          height="100%"
+          theme={tokyoNight}
+          extensions={[css()]}
+          onChange={(value) => onCustomCssChange(value || undefined)}
+          basicSetup={{
+            lineNumbers: true,
+            highlightActiveLineGutter: true,
+            highlightSpecialChars: true,
+            foldGutter: true,
+            drawSelection: true,
+            dropCursor: true,
+            allowMultipleSelections: true,
+            indentOnInput: true,
+            bracketMatching: true,
+            closeBrackets: true,
+            autocompletion: true,
+            rectangularSelection: true,
+            crosshairCursor: true,
+            highlightActiveLine: true,
+            highlightSelectionMatches: true,
+            closeBracketsKeymap: true,
+            searchKeymap: true,
+            foldKeymap: true,
+            completionKeymap: true,
+            lintKeymap: true,
           }}
+          className="css-editor-codemirror"
         />
-        <p
-          style={{
-            marginTop: "8px",
-            fontSize: "12px",
-            color: "var(--crayon-secondary-text)",
-          }}
-        >
+        <p className="css-editor__hint">
           Write custom CSS to override theme styles. Changes apply immediately.
         </p>
       </div>

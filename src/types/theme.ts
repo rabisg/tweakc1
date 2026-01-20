@@ -10,6 +10,54 @@ export const ShadowConfigSchema = z.object({
 });
 
 export const ThemeCustomizationSchema = z.object({
+  // Fills
+  fills: z.object({
+    backgroundFills: z.string().optional(),
+    containerFills: z.string().optional(),
+    overlayFills: z.string().optional(),
+    sunkFills: z.string().optional(),
+    containerHoverFills: z.string().optional(),
+    dangerFills: z.string().optional(),
+    successFills: z.string().optional(),
+    infoFills: z.string().optional(),
+    elevatedFills: z.string().optional(),
+    alertFills: z.string().optional(),
+    sunkBgFills: z.string().optional(),
+    invertedFills: z.string().optional(),
+    highlightSubtle: z.string().optional(),
+  }).optional(),
+  // Text colors
+  text: z.object({
+    brandText: z.string().optional(),
+    brandSecondaryText: z.string().optional(),
+    primaryText: z.string().optional(),
+    secondaryText: z.string().optional(),
+    disabledText: z.string().optional(),
+    dangerText: z.string().optional(),
+    successText: z.string().optional(),
+    linkText: z.string().optional(),
+    infoText: z.string().optional(),
+    alertText: z.string().optional(),
+    accentPrimaryText: z.string().optional(),
+    accentSecondaryText: z.string().optional(),
+    accentDisabledText: z.string().optional(),
+  }).optional(),
+  // Interactive colors
+  interactive: z.object({
+    interactiveDefault: z.string().optional(),
+    interactiveHover: z.string().optional(),
+    interactivePressed: z.string().optional(),
+    interactiveDisabled: z.string().optional(),
+    interactiveAccent: z.string().optional(),
+    interactiveAccentHover: z.string().optional(),
+    interactiveAccentPressed: z.string().optional(),
+    interactiveAccentDisabled: z.string().optional(),
+    interactiveDestructive: z.string().optional(),
+    interactiveDestructiveHover: z.string().optional(),
+    interactiveDestructivePressed: z.string().optional(),
+    interactiveDestructiveDisabled: z.string().optional(),
+  }).optional(),
+  // Legacy colors object for backwards compatibility
   colors: z.object({
     background: z.string().optional(),
     container: z.string().optional(),
@@ -23,13 +71,29 @@ export const ThemeCustomizationSchema = z.object({
     alert: z.string().optional(),
   }),
   chartColors: z.object({
-    color1: z.string().optional(),
-    color2: z.string().optional(),
-    color3: z.string().optional(),
+    primary: z.string().optional(), // Main chart color (position 6 in single mode, position 5 in dual mode)
+    secondary: z.string().optional(), // Second chart color (position 6 in dual mode)
+    useDualMode: z.boolean().optional(), // If true, use two colors; if false/undefined, use single color
   }),
   strokeColors: z.object({
-    base: z.string().optional(),
-    opacity: z.number().min(0).max(1).optional(), // Base opacity, variants will be auto-generated
+    // Base stroke colors
+    default: z.string().optional(),
+    interactiveEl: z.string().optional(),
+    interactiveElHover: z.string().optional(),
+    interactiveElSelected: z.string().optional(),
+    emphasis: z.string().optional(),
+    // Accent strokes
+    accent: z.string().optional(),
+    accentEmphasis: z.string().optional(),
+    // Status strokes
+    info: z.string().optional(),
+    infoEmphasis: z.string().optional(),
+    alert: z.string().optional(),
+    alertEmphasis: z.string().optional(),
+    success: z.string().optional(),
+    successEmphasis: z.string().optional(),
+    danger: z.string().optional(),
+    dangerEmphasis: z.string().optional(),
   }),
   chatColors: z.object({
     containerBg: z.string().optional(),
@@ -46,16 +110,48 @@ export const ThemeCustomizationSchema = z.object({
     mono: z.string().optional(),
   }),
   fontWeight: z.object({
-    scale: z.number().min(0.5).max(1.5).optional(), // multiplier for all font weights
+    regular: z.number().min(100).max(900).optional(), // overrides 400 weight fonts
+    medium: z.number().min(100).max(900).optional(),  // overrides 500 weight fonts
+    bold: z.number().min(100).max(900).optional(),    // overrides 600 weight fonts
   }),
   letterSpacing: z.object({
-    base: z.number().optional(), // in em units
+    body: z.number().optional(), // in px units
+    heading: z.number().optional(), // in px units
+    numbers: z.number().optional(), // in px units (for monospace)
+  }),
+  fontSize: z.object({
+    base: z.number().min(12).max(20).optional(), // base body font size in px (default 16)
   }),
   spacing: z.object({
     base: z.number().min(0.5).max(2).optional(),
+    // Individual spacing values (in px)
+    spacing0: z.number().optional(),
+    spacing3xs: z.number().optional(),
+    spacing2xs: z.number().optional(),
+    spacingXs: z.number().optional(),
+    spacingS: z.number().optional(),
+    spacingM: z.number().optional(),
+    spacingL: z.number().optional(),
+    spacingXl: z.number().optional(),
+    spacing2xl: z.number().optional(),
+    spacing3xl: z.number().optional(),
   }),
   borderRadius: z.object({
     base: z.number().min(0).max(8).optional(), // in rem, 0 (sharp) to 8 (very rounded)
+    // Individual border radius values (in px)
+    rounded0: z.number().optional(),
+    rounded3xs: z.number().optional(),
+    rounded2xs: z.number().optional(),
+    roundedXs: z.number().optional(),
+    roundedS: z.number().optional(),
+    roundedM: z.number().optional(),
+    roundedL: z.number().optional(),
+    roundedXl: z.number().optional(),
+    rounded2xl: z.number().optional(),
+    rounded3xl: z.number().optional(),
+    rounded4xl: z.number().optional(),
+    roundedFull: z.number().optional(),
+    roundedClickable: z.number().optional(),
   }),
   customCss: z.string().optional(),
 });

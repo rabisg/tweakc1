@@ -1,5 +1,3 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@crayonai/react-ui";
-import { Sparkles } from "lucide-react";
 import { ThemeCustomization, ShadowConfig, ThemeMode } from "../types/theme";
 import { ColorControls } from "./ColorControls";
 import { FontControls } from "./FontControls";
@@ -15,17 +13,31 @@ interface SidebarProps {
   onValueChange: (value: string) => void;
   customization: ThemeCustomization;
   currentMode: ThemeMode;
+  currentPreset: string;
+  onPresetChange: (preset: string) => void;
   onColorChange: (
     key: keyof ThemeCustomization["colors"],
     value?: string
   ) => void;
+  onFillChange: (
+    key: keyof NonNullable<ThemeCustomization["fills"]>,
+    value?: string
+  ) => void;
+  onTextChange: (
+    key: keyof NonNullable<ThemeCustomization["text"]>,
+    value?: string
+  ) => void;
+  onInteractiveChange: (
+    key: keyof NonNullable<ThemeCustomization["interactive"]>,
+    value?: string
+  ) => void;
   onChartColorChange: (
     key: keyof ThemeCustomization["chartColors"],
-    value?: string
+    value?: string | boolean
   ) => void;
   onStrokeColorChange: (
     key: keyof ThemeCustomization["strokeColors"],
-    value?: string | number
+    value?: string
   ) => void;
   onChatColorChange: (
     key: keyof ThemeCustomization["chatColors"],
@@ -36,10 +48,21 @@ interface SidebarProps {
     category: keyof ThemeCustomization["fonts"],
     value?: string
   ) => void;
-  onLetterSpacingChange: (value?: number) => void;
-  onFontWeightChange: (value?: number) => void;
+  onLetterSpacingChange: (
+    category: keyof ThemeCustomization["letterSpacing"],
+    value?: number
+  ) => void;
+  onFontWeightChange: (
+    category: keyof ThemeCustomization["fontWeight"],
+    value?: number
+  ) => void;
+  onFontSizeChange: (value?: number) => void;
   onSpacingChange: (value?: number) => void;
   onBorderRadiusChange: (value?: number) => void;
+  onIndividualSpacingChange: (key: string, value?: number) => void;
+  onIndividualBorderRadiusChange: (key: string, value?: number) => void;
+  onApplyBorderRadiusPreset: (values: Record<string, number>) => void;
+  onApplySpacingPreset: (values: Record<string, number>) => void;
   onPresetSelect: (presetName: string) => void;
   onReset: () => void;
   onCurrentModeThemeGenerated: (theme: ThemeCustomization) => void;
@@ -51,7 +74,12 @@ export function Sidebar({
   onValueChange,
   customization,
   currentMode,
-  onColorChange,
+  currentPreset,
+  onPresetChange,
+  onColorChange: _onColorChange,
+  onFillChange,
+  onTextChange,
+  onInteractiveChange,
   onChartColorChange,
   onStrokeColorChange,
   onChatColorChange,
@@ -59,86 +87,133 @@ export function Sidebar({
   onFontChange,
   onLetterSpacingChange,
   onFontWeightChange,
+  onFontSizeChange,
   onSpacingChange,
   onBorderRadiusChange,
+  onIndividualSpacingChange,
+  onIndividualBorderRadiusChange,
+  onApplyBorderRadiusPreset,
+  onApplySpacingPreset,
   onPresetSelect,
   onReset,
   onCurrentModeThemeGenerated,
   onCustomCssChange,
 }: SidebarProps) {
   return (
-    <aside
-      className="w-140 overflow-y-auto flex flex-col"
-      style={{
-        borderRight: "1px solid var(--crayon-stroke-emphasis)",
-      }}
-    >
+    <aside className="sidebar">
       <PresetSelector
         onPresetSelect={onPresetSelect}
         onReset={onReset}
         customization={customization}
+        currentPreset={currentPreset}
+        onPresetChange={onPresetChange}
       />
-      <Tabs value={value} onValueChange={onValueChange}>
-        <TabsList>
-          <TabsTrigger value="colors" text="Colors" />
-          <TabsTrigger value="typography" text="Typography" />
-          <TabsTrigger value="other" text="Other" />
-          <TabsTrigger value="css" text="CSS" />
-          <TabsTrigger value="generate" text="Generate" icon={<Sparkles />} />
-        </TabsList>
-        <TabsContent value="generate">
-          <GenerateControls
-            customization={customization}
-            currentMode={currentMode}
-            onThemeGenerated={onCurrentModeThemeGenerated}
-            onApiKeyChange={() => {}}
-          />
-        </TabsContent>
-        <TabsContent value="colors">
-          <ChatControls
-            chatColors={customization.chatColors}
-            onChatColorChange={onChatColorChange}
-          />
-          <ColorControls
-            colors={customization.colors}
-            chartColors={customization.chartColors}
-            onColorChange={onColorChange}
-            onChartColorChange={onChartColorChange}
-          />
-          <StrokeControls
-            strokeColors={customization.strokeColors}
-            onStrokeColorChange={onStrokeColorChange}
-          />
-        </TabsContent>
-        <TabsContent value="typography">
-          <FontControls
-            fonts={customization.fonts}
-            fontWeight={customization.fontWeight}
-            letterSpacing={customization.letterSpacing}
-            onFontChange={onFontChange}
-            onFontWeightChange={onFontWeightChange}
-            onLetterSpacingChange={onLetterSpacingChange}
-          />
-        </TabsContent>
-        <TabsContent value="other">
-          <SpacingControls
-            spacing={customization.spacing}
-            borderRadius={customization.borderRadius}
-            onSpacingChange={onSpacingChange}
-            onBorderRadiusChange={onBorderRadiusChange}
-          />
-          {/* <ShadowControls
-            shadow={customization.shadow}
-            onShadowChange={onShadowChange}
-          /> */}
-        </TabsContent>
-        <TabsContent value="css">
-          <CssOverrideControls
-            customCss={customization.customCss}
-            onCustomCssChange={onCustomCssChange}
-          />
-        </TabsContent>
-      </Tabs>
+
+      <div className="custom-tabs">
+        <div className="custom-tabs__list">
+          <button
+            className={`custom-tabs__trigger ${value === "colors" ? "custom-tabs__trigger--active" : ""}`}
+            onClick={() => onValueChange("colors")}
+          >
+            Colors
+          </button>
+          <button
+            className={`custom-tabs__trigger ${value === "typography" ? "custom-tabs__trigger--active" : ""}`}
+            onClick={() => onValueChange("typography")}
+          >
+            Typography
+          </button>
+          <button
+            className={`custom-tabs__trigger ${value === "other" ? "custom-tabs__trigger--active" : ""}`}
+            onClick={() => onValueChange("other")}
+          >
+            Other
+          </button>
+          <button
+            className={`custom-tabs__trigger ${value === "css" ? "custom-tabs__trigger--active" : ""}`}
+            onClick={() => onValueChange("css")}
+          >
+            CSS
+          </button>
+          <button
+            className={`custom-tabs__trigger ${value === "generate" ? "custom-tabs__trigger--active" : ""}`}
+            onClick={() => onValueChange("generate")}
+          >
+            Generate
+          </button>
+        </div>
+
+        <div className="custom-tabs__content">
+          {value === "colors" && (
+            <>
+              <ColorControls
+                fills={customization.fills || {}}
+                text={customization.text || {}}
+                interactive={customization.interactive || {}}
+                chartColors={customization.chartColors}
+                onFillChange={onFillChange}
+                onTextChange={onTextChange}
+                onInteractiveChange={onInteractiveChange}
+                onChartColorChange={onChartColorChange}
+                mode={currentMode}
+              />
+              <StrokeControls
+                strokeColors={customization.strokeColors}
+                onStrokeColorChange={onStrokeColorChange}
+                mode={currentMode}
+              />
+              <ChatControls
+                chatColors={customization.chatColors}
+                onChatColorChange={onChatColorChange}
+                mode={currentMode}
+              />
+            </>
+          )}
+
+          {value === "typography" && (
+            <FontControls
+              fonts={customization.fonts}
+              fontWeight={customization.fontWeight}
+              letterSpacing={customization.letterSpacing}
+              fontSize={customization.fontSize}
+              onFontChange={onFontChange}
+              onFontWeightChange={onFontWeightChange}
+              onLetterSpacingChange={onLetterSpacingChange}
+              onFontSizeChange={onFontSizeChange}
+            />
+          )}
+
+          {value === "other" && (
+            <SpacingControls
+              spacing={customization.spacing}
+              borderRadius={customization.borderRadius}
+              onSpacingChange={onSpacingChange}
+              onBorderRadiusChange={onBorderRadiusChange}
+              onIndividualSpacingChange={onIndividualSpacingChange}
+              onIndividualBorderRadiusChange={onIndividualBorderRadiusChange}
+              onApplyBorderRadiusPreset={onApplyBorderRadiusPreset}
+              onApplySpacingPreset={onApplySpacingPreset}
+              currentPreset={currentPreset}
+            />
+          )}
+
+          {value === "generate" && (
+            <GenerateControls
+              customization={customization}
+              currentMode={currentMode}
+              onThemeGenerated={onCurrentModeThemeGenerated}
+              onApiKeyChange={() => {}}
+            />
+          )}
+
+          {value === "css" && (
+            <CssOverrideControls
+              customCss={customization.customCss}
+              onCustomCssChange={onCustomCssChange}
+            />
+          )}
+        </div>
+      </div>
     </aside>
   );
 }

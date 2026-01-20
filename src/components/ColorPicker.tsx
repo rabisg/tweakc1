@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
+import { AlertCircle } from "lucide-react";
 import { ColorPickerProps } from "../types/theme";
 import { parseColor } from "../utils/colorParser";
+import { getDefaultColor } from "../utils/defaultThemeColors";
+
+interface ExtendedColorPickerProps extends ColorPickerProps {
+  cssVariable?: string; // CSS variable name (e.g., "--crayon-primary-text")
+  mode?: "light" | "dark"; // Current theme mode
+}
 
 // Helper to convert any CSS color to hex
 function rgbaToHex(color: string): string {
+  try {
   const { r, g, b } = parseColor(color);
-
   return (
     "#" +
     [r, g, b]
@@ -15,6 +22,9 @@ function rgbaToHex(color: string): string {
       })
       .join("")
   );
+  } catch {
+    return "#000000";
+  }
 }
 
 // Helper to convert hex to rgba
@@ -42,128 +52,156 @@ function isValidColor(color: string): boolean {
   return tempElement.style.color !== "";
 }
 
+// Convert any valid CSS color (including named colors) to rgba format
+function normalizeColorToRgba(color: string): string {
+  if (!color) return "";
+  
+  try {
+    // Use parseColor to handle all color formats including named colors
+    const { r, g, b, a } = parseColor(color);
+    return `rgba(${r},${g},${b},${a})`;
+  } catch {
+    return color; // Return as-is if parsing fails
+  }
+}
+
+// Format color for display (shorten if possible)
+function formatColorDisplay(color: string): string {
+  if (!color) return "";
+  // Show shortened version for rgba with 1 or 0.5 alpha
+  const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+  if (rgbaMatch) {
+    const [, r, g, b, a = "1"] = rgbaMatch;
+    return `rgba(${r},${g},${b},${a})`;
+  }
+  return color;
+}
+
 export function ColorPicker({
   value,
   onChange,
   label,
   disabled,
-}: ColorPickerProps) {
-  const [inputValue, setInputValue] = useState(value || "");
+  cssVariable,
+  mode = "dark",
+}: ExtendedColorPickerProps) {
   const [isValid, setIsValid] = useState(true);
+  const [isFocused, setIsFocused] = useState(false);
+  const [localValue, setLocalValue] = useState("");
 
-  const hexValue = value ? rgbaToHex(value) : "#000000";
+  // Get the default color for this CSS variable and mode
+  const defaultColor = cssVariable ? getDefaultColor(cssVariable, mode) : "";
 
-  // Sync input value when external value changes
+  // The effective value to display (custom value or default)
+  const effectiveValue = value || defaultColor;
+  const hexValue = effectiveValue ? rgbaToHex(effectiveValue) : "#000000";
+
+  // Sync local value when external value changes (and not focused)
   useEffect(() => {
-    if (value !== inputValue && isValid) {
-      setInputValue(value || "");
+    if (!isFocused) {
+      setLocalValue(value || "");
     }
-  }, [value, isValid]);
+  }, [value, isFocused]);
 
   const handleTextChange = (newValue: string) => {
-    setInputValue(newValue);
+    setLocalValue(newValue);
+    // Clear any previous error state while typing
+    setIsValid(true);
+  };
 
-    // Empty string means reset/clear the color
-    if (newValue.trim() === "") {
-      setIsValid(true);
-      onChange(undefined as any); // Reset to undefined
-    } else if (isValidColor(newValue)) {
-      setIsValid(true);
-      onChange(newValue);
-    } else {
-      setIsValid(false);
+  const handleFocus = () => {
+    setIsFocused(true);
+    // When focusing, show the current value (or empty to type fresh)
+    setLocalValue(value || "");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.currentTarget.blur(); // Trigger blur to validate and apply
     }
   };
 
   const handleBlur = () => {
-    // Reset to last valid value on blur if invalid
-    if (!isValid) {
-      setInputValue(value || "");
+    setIsFocused(false);
+    
+    const trimmedValue = localValue.trim();
+    
+    // Empty string means reset/clear the color
+    if (trimmedValue === "") {
       setIsValid(true);
+      onChange(undefined as any); // Reset to undefined
+      setLocalValue("");
+    } else if (isValidColor(trimmedValue)) {
+      setIsValid(true);
+      // Normalize to rgba format for consistency (handles named colors like "red", "blue", etc.)
+      const normalizedColor = normalizeColorToRgba(trimmedValue);
+      onChange(normalizedColor);
+      setLocalValue(normalizedColor);
+    } else {
+      // Invalid color - show error and reset to last valid value
+      setIsValid(false);
+      setTimeout(() => {
+        setLocalValue(value || "");
+        setIsValid(true);
+      }, 1500); // Show error for 1.5 seconds before resetting
     }
   };
 
+  // Determine what to show in the input
+  const displayValue = isFocused 
+    ? localValue 
+    : (value ? formatColorDisplay(value) : formatColorDisplay(defaultColor));
+
+  let inputClassName = "color-picker__input";
+  
+  if (!isValid) {
+    inputClassName += " color-picker__input--error";
+  } else if (isFocused) {
+    inputClassName += " color-picker__input--active";
+  } else if (effectiveValue) {
+    // Show filled state for any value (custom or default)
+    inputClassName += " color-picker__input--filled";
+  }
+
   return (
-    <div style={{ marginBottom: "16px" }}>
+    <div className="color-picker">
       {label && (
-        <label
-          style={{
-            display: "block",
-            fontSize: "14px",
-            fontWeight: "400",
-            marginBottom: "8px",
-            color: "var(--crayon-primary-text)",
-          }}
-        >
+        <label className="color-picker__label">
           {label}
         </label>
       )}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <div
-          style={{
-            width: "48px",
-            height: "48px",
-            borderRadius: "6px",
-            background: value || "#ffffff",
-            border: "1px solid var(--crayon-stroke-emphasis)",
-            flexShrink: 0,
-            cursor: "pointer",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
+      <div className="color-picker__controls">
+        <div className="color-picker__input-wrapper">
+          <input
+            type="text"
+            value={displayValue}
+            onChange={(e) => handleTextChange(e.target.value)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            placeholder="rgba(0,0,0,0.5) or red, blue..."
+            className={inputClassName}
+          />
+          {!isValid && (
+            <AlertCircle className="color-picker__error-icon" size={16} />
+          )}
+        </div>
+        <div className="color-picker__swatch" style={{ background: effectiveValue || "#ffffff" }}>
           <input
             type="color"
             value={hexValue}
             onChange={(e) => {
               const rgbaColor = hexToRgba(e.target.value);
               onChange(rgbaColor);
-              setInputValue(rgbaColor);
+              setLocalValue(rgbaColor);
               setIsValid(true);
             }}
             disabled={disabled}
-            style={{
-              position: "absolute",
-              width: "100%",
-              height: "100%",
-              opacity: 0,
-              cursor: disabled ? "not-allowed" : "pointer",
-            }}
+            className="color-picker__swatch-input"
           />
         </div>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => handleTextChange(e.target.value)}
-          onBlur={handleBlur}
-          disabled={disabled}
-          placeholder="e.g., oklch(0.922 0 0)"
-          style={{
-            flex: 1,
-            padding: "12px",
-            fontSize: "14px",
-            border: `1px solid ${
-              isValid ? "var(--crayon-stroke-emphasis)" : "#ef4444"
-            }`,
-            borderRadius: "6px",
-            background: "var(--crayon-background-fills)",
-            color: isValid ? "var(--crayon-primary-text)" : "#ef4444",
-            outline: "none",
-            transition: "border-color 0.2s, color 0.2s",
-          }}
-        />
       </div>
-      {!isValid && (
-        <div
-          style={{
-            marginTop: "4px",
-            fontSize: "12px",
-            color: "#ef4444",
-          }}
-        >
-          Invalid color format
-        </div>
-      )}
     </div>
   );
 }

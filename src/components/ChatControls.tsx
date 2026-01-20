@@ -1,6 +1,6 @@
 import { ColorPicker } from "./ColorPicker";
 import { Section } from "./Section";
-import { ThemeCustomization } from "../types/theme";
+import { ThemeCustomization, ThemeMode } from "../types/theme";
 
 interface ChatControlsProps {
   chatColors: ThemeCustomization["chatColors"];
@@ -8,41 +8,30 @@ interface ChatControlsProps {
     key: keyof ThemeCustomization["chatColors"],
     value?: string
   ) => void;
+  mode: ThemeMode;
 }
 
 export function ChatControls({
   chatColors,
   onChatColorChange,
+  mode,
 }: ChatControlsProps) {
   return (
-    <div style={{ padding: "16px" }}>
-      <Section title="Chat UI Colors" defaultOpen={true}>
-        <ColorPicker
-          label="Container Background"
-          value={chatColors.containerBg}
-          onChange={(color) => onChatColorChange("containerBg", color)}
-        />
-        <ColorPicker
-          label="Assistant Background"
-          value={chatColors.assistantBg}
-          onChange={(color) => onChatColorChange("assistantBg", color)}
-        />
-        <ColorPicker
-          label="Assistant Text"
-          value={chatColors.assistantText}
-          onChange={(color) => onChatColorChange("assistantText", color)}
-        />
-        <ColorPicker
-          label="User Background"
-          value={chatColors.userBg}
-          onChange={(color) => onChatColorChange("userBg", color)}
-        />
-        <ColorPicker
-          label="User Text"
-          value={chatColors.userText}
-          onChange={(color) => onChatColorChange("userText", color)}
-        />
-      </Section>
-    </div>
+    <Section title="User message" defaultOpen={false}>
+      <ColorPicker
+        label="User Background"
+        value={chatColors.userBg}
+        onChange={(color) => onChatColorChange("userBg", color)}
+        cssVariable="--crayon-chat-user-response-bg"
+        mode={mode}
+      />
+      <ColorPicker
+        label="User Text"
+        value={chatColors.userText}
+        onChange={(color) => onChatColorChange("userText", color)}
+        cssVariable="--crayon-chat-user-response-text"
+        mode={mode}
+      />
+    </Section>
   );
 }

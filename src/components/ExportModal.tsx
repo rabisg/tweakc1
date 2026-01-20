@@ -1,5 +1,9 @@
 import { Dialog } from "./Dialog";
 import { toast } from "sonner";
+import { Button } from "@crayonai/react-ui";
+import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -25,48 +29,51 @@ export function ExportModal({ isOpen, onClose, themeCode }: ExportModalProps) {
       title="Export Theme"
       maxWidth="lg"
     >
-      <pre
-        style={{
-          background: "var(--bg-secondary, #f3f4f6)",
-          padding: "16px",
-          borderRadius: "8px",
-          overflow: "auto",
-          fontSize: "13px",
-          lineHeight: "1.5",
-          maxHeight: "60vh",
-          margin: "0 0 16px 0",
-        }}
-      >
-        {themeCode}
-      </pre>
+      <div style={{ marginBottom: "16px" }}>
+        <CodeMirror
+          value={themeCode}
+          height="60vh"
+          theme={tokyoNight}
+          extensions={[javascript({ typescript: true })]}
+          editable={false}
+          basicSetup={{
+            lineNumbers: true,
+            highlightActiveLineGutter: false,
+            highlightSpecialChars: true,
+            foldGutter: true,
+            drawSelection: false,
+            dropCursor: false,
+            allowMultipleSelections: false,
+            indentOnInput: false,
+            bracketMatching: true,
+            closeBrackets: false,
+            autocompletion: false,
+            rectangularSelection: false,
+            crosshairCursor: false,
+            highlightActiveLine: false,
+            highlightSelectionMatches: false,
+            closeBracketsKeymap: false,
+            searchKeymap: true,
+            foldKeymap: true,
+            completionKeymap: false,
+            lintKeymap: false,
+          }}
+          style={{
+            fontFamily: "'Geist Mono', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+            fontSize: "13px",
+            borderRadius: "var(--crayon-rounded-l)",
+            overflow: "hidden",
+            border: "1px solid #292e42",
+          }}
+        />
+      </div>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
-        <button
-          onClick={onClose}
-          style={{
-            padding: "8px 16px",
-            fontSize: "14px",
-            border: "1px solid var(--crayon-stroke-emphasis)",
-            borderRadius: "6px",
-            background: "var(--bg-secondary)",
-            cursor: "pointer",
-          }}
-        >
+        <Button variant="secondary" onClick={onClose}>
           Close
-        </button>
-        <button
-          onClick={handleCopyToClipboard}
-          style={{
-            padding: "8px 16px",
-            fontSize: "14px",
-            border: "none",
-            borderRadius: "6px",
-            background: "#000",
-            color: "#fff",
-            cursor: "pointer",
-          }}
-        >
+        </Button>
+        <Button variant="primary" onClick={handleCopyToClipboard}>
           Copy to Clipboard
-        </button>
+        </Button>
       </div>
     </Dialog>
   );

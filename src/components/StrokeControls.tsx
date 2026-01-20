@@ -1,95 +1,62 @@
-import { Slider } from "@crayonai/react-ui";
 import { ColorPicker } from "./ColorPicker";
 import { Section } from "./Section";
-import { ThemeCustomization } from "../types/theme";
+import { ThemeCustomization, ThemeMode } from "../types/theme";
 
 interface StrokeControlsProps {
   strokeColors: ThemeCustomization["strokeColors"];
   onStrokeColorChange: (
     field: keyof ThemeCustomization["strokeColors"],
-    value?: string | number
+    value?: string
   ) => void;
+  mode: ThemeMode;
 }
+
+const strokeColorFields: {
+  key: keyof ThemeCustomization["strokeColors"];
+  label: string;
+  cssVariable: string;
+}[] = [
+  // Base strokes
+  { key: "default", label: "Default", cssVariable: "--crayon-stroke-default" },
+  { key: "interactiveEl", label: "Interactive", cssVariable: "--crayon-stroke-interactive-el" },
+  { key: "interactiveElHover", label: "Interactive Hover", cssVariable: "--crayon-stroke-interactive-el-hover" },
+  { key: "interactiveElSelected", label: "Interactive Selected", cssVariable: "--crayon-stroke-interactive-el-selected" },
+  { key: "emphasis", label: "Emphasis", cssVariable: "--crayon-stroke-emphasis" },
+  // Accent strokes
+  { key: "accent", label: "Accent", cssVariable: "--crayon-stroke-accent" },
+  { key: "accentEmphasis", label: "Accent Emphasis", cssVariable: "--crayon-stroke-accent-emphasis" },
+  // Status strokes
+  { key: "info", label: "Info", cssVariable: "--crayon-stroke-info" },
+  { key: "infoEmphasis", label: "Info Emphasis", cssVariable: "--crayon-stroke-info-emphasis" },
+  { key: "alert", label: "Alert", cssVariable: "--crayon-stroke-alert" },
+  { key: "alertEmphasis", label: "Alert Emphasis", cssVariable: "--crayon-stroke-alert-emphasis" },
+  { key: "success", label: "Success", cssVariable: "--crayon-stroke-success" },
+  { key: "successEmphasis", label: "Success Emphasis", cssVariable: "--crayon-stroke-success-emphasis" },
+  { key: "danger", label: "Danger", cssVariable: "--crayon-stroke-danger" },
+  { key: "dangerEmphasis", label: "Danger Emphasis", cssVariable: "--crayon-stroke-danger-emphasis" },
+];
 
 export function StrokeControls({
   strokeColors,
   onStrokeColorChange,
+  mode,
 }: StrokeControlsProps) {
-  const baseColor = strokeColors.base || "rgba(0, 0, 0, 1)";
-  const opacity = strokeColors.opacity ?? 0.2;
-
   return (
-    <div style={{ padding: "16px" }}>
       <Section title="Stroke Colors" defaultOpen={false}>
-        <div
-          style={{
-            marginBottom: "16px",
-            fontSize: "13px",
-            color: "var(--crayon-secondary-text)",
-          }}
-        >
-          Configure base stroke color and opacity. All stroke variants
-          (interactive, emphasis, status) will be auto-generated.
-        </div>
+      <p className="section__description">
+        Configure border and stroke colors for various UI states.
+      </p>
 
+      {strokeColorFields.map(({ key, label, cssVariable }) => (
         <ColorPicker
-          label="Base Color"
-          value={baseColor}
-          onChange={(color) => onStrokeColorChange("base", color)}
-        />
-
-        <div style={{ marginBottom: "16px" }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: "14px",
-              fontWeight: "400",
-              marginBottom: "8px",
-              color: "var(--crayon-primary-text)",
-            }}
-          >
-            Base Opacity
-          </label>
-          <Slider
-            variant="continuous"
-            min={0}
-            max={1}
-            step={0.01}
-            value={[opacity]}
-            onValueChange={(values) =>
-              onStrokeColorChange("opacity", values[0])
-            }
-            style={{ flex: 1 }}
-            rightContent={
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  marginLeft: "12px",
-                }}
-              >
-                <input
-                  type="text"
-                  value={opacity.toFixed(2)}
-                  readOnly
-                  style={{
-                    width: "80px",
-                    padding: "8px 12px",
-                    fontSize: "14px",
-                    border: "1px solid var(--crayon-stroke-emphasis)",
-                    borderRadius: "6px",
-                    background: "var(--crayon-background-fills)",
-                    color: "var(--crayon-primary-text)",
-                    textAlign: "right",
-                    outline: "none",
-                  }}
+          key={key}
+          label={label}
+          value={strokeColors[key]}
+          onChange={(color) => onStrokeColorChange(key, color)}
+          cssVariable={cssVariable}
+          mode={mode}
                 />
-              </div>
-            }
-          />
-        </div>
+      ))}
       </Section>
-    </div>
   );
 }

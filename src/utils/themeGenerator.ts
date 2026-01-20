@@ -5,6 +5,31 @@ import { parseColor } from "./colorParser";
 // Alias for backwards compatibility
 const parseRGBA = parseColor;
 
+// Export the default color engine for tests
+export const defaultColorEngine = colorEngines.default;
+
+// Extended colors type for backwards compatibility with legacy presets
+type ExtendedColors = ThemeCustomization["colors"] & {
+  backgroundSecondary?: string;
+  backgroundTertiary?: string;
+  containerHover?: string;
+  sunk?: string;
+  elevated?: string;
+  overlay?: string;
+  highlightSubtle?: string;
+  primaryHover?: string;
+  primaryPressed?: string;
+  primaryDisabled?: string;
+  neutralDefault?: string;
+  neutralHover?: string;
+  neutralPressed?: string;
+  neutralDisabled?: string;
+  textPrimaryInverse?: string;
+  textDisabled?: string;
+  dangerHover?: string;
+  dangerPressed?: string;
+};
+
 // Generate semantic colors using the selected engine
 export function generateSemanticColors(
   colors: ThemeCustomization["colors"],
@@ -12,89 +37,131 @@ export function generateSemanticColors(
   mode: "light" | "dark"
 ): Record<string, string> {
   const result: Record<string, string> = {};
+  // Cast to extended type to support legacy properties
+  const extColors = colors as ExtendedColors;
 
-  // Background and container colors
-  if (colors.background) {
-    result.backgroundFills = colors.background;
-    result.chatContainerBg = colors.background;
+  // Background fills
+  if (extColors.background) {
+    result.backgroundFills = extColors.background;
+    result.chatContainerBg = extColors.background;
+  }
+  if (extColors.backgroundSecondary) {
+    result.backgroundSecondary = extColors.backgroundSecondary;
+  }
+  if (extColors.backgroundTertiary) {
+    result.backgroundTertiary = extColors.backgroundTertiary;
+  }
+  if (extColors.container) {
+    result.containerFills = extColors.container;
+    result.chatAssistantResponseBg = extColors.container;
+  }
+  if (extColors.containerHover) {
+    result.containerHoverFills = extColors.containerHover;
+  } else if (extColors.container) {
+    result.containerHoverFills = engine.generateHover(extColors.container, mode);
+  }
+  if (extColors.sunk) {
+    result.sunkFills = extColors.sunk;
+  }
+  if (extColors.elevated) {
+    result.elevatedFills = extColors.elevated;
+  }
+  if (extColors.overlay) {
+    result.overlayFills = extColors.overlay;
+  }
+  if (extColors.highlightSubtle) {
+    result.highlightSubtle = extColors.highlightSubtle;
   }
 
-  if (colors.container) {
-    result.containerFills = colors.container;
-    result.chatAssistantResponseBg = colors.container;
-    result.containerHoverFills = engine.generateHover(colors.container, mode);
+  // Interactive accent colors
+  if (extColors.primary) {
+    result.interactiveAccent = extColors.primary;
+  }
+  if (extColors.primaryHover) {
+    result.interactiveAccentHover = extColors.primaryHover;
+  } else if (extColors.primary) {
+    result.interactiveAccentHover = engine.generateHover(extColors.primary, mode);
+  }
+  if (extColors.primaryPressed) {
+    result.interactiveAccentPressed = extColors.primaryPressed;
+  } else if (extColors.primary) {
+    result.interactiveAccentPressed = engine.generatePressed(extColors.primary, mode);
+  }
+  if (extColors.primaryDisabled) {
+    result.interactiveAccentDisabled = extColors.primaryDisabled;
+  } else if (extColors.primary) {
+    result.interactiveAccentDisabled = engine.generateDisabled(extColors.primary, mode);
   }
 
-  // Primary/accent colors
-  if (colors.primary) {
-    result.interactiveAccent = colors.primary;
-    result.interactiveAccentHover = engine.generateHover(colors.primary, mode);
-    result.interactiveAccentPressed = engine.generatePressed(
-      colors.primary,
-      mode
-    );
-    result.interactiveAccentDisabled = engine.generateDisabled(
-      colors.primary,
-      mode
-    );
-    result.strokeInteractiveElSelected = colors.primary;
+  // Interactive neutral colors
+  if (extColors.neutralDefault) {
+    result.neutralDefault = extColors.neutralDefault;
+  }
+  if (extColors.neutralHover) {
+    result.neutralHover = extColors.neutralHover;
+  }
+  if (extColors.neutralPressed) {
+    result.neutralPressed = extColors.neutralPressed;
+  }
+  if (extColors.neutralDisabled) {
+    result.neutralDisabled = extColors.neutralDisabled;
   }
 
   // Text colors
-  if (colors.textPrimary) {
-    result.primaryText = colors.textPrimary;
-    result.chatAssistantResponseText = colors.textPrimary;
-    result.chatUserResponseText = colors.textPrimary;
+  if (extColors.textPrimary) {
+    result.primaryText = extColors.textPrimary;
+    result.chatAssistantResponseText = extColors.textPrimary;
+    result.chatUserResponseText = extColors.textPrimary;
+  }
+  if (extColors.textSecondary) {
+    result.secondaryText = extColors.textSecondary;
+  }
+  if (extColors.textPrimaryInverse) {
+    result.primaryTextInverse = extColors.textPrimaryInverse;
+  }
+  if (extColors.textDisabled) {
+    result.disabledText = extColors.textDisabled;
+  }
+  if (extColors.linkText) {
+    result.linkText = extColors.linkText;
   }
 
-  if (colors.textSecondary) {
-    result.secondaryText = colors.textSecondary;
+  // Status colors - Danger
+  if (extColors.danger) {
+    result.dangerFills = engine.generateSubtle(extColors.danger, mode);
+    result.dangerText = extColors.danger;
+    result.dangerPrimaryText = extColors.danger;
+    result.interactiveDestructive = engine.generateSubtle(extColors.danger, mode);
+  }
+  if (extColors.dangerHover) {
+    result.interactiveDestructiveHover = extColors.dangerHover;
+  } else if (extColors.danger) {
+    result.interactiveDestructiveHover = engine.generateHover(extColors.danger, mode);
+  }
+  if (extColors.dangerPressed) {
+    result.interactiveDestructivePressed = extColors.dangerPressed;
+  } else if (extColors.danger) {
+    result.interactiveDestructivePressed = engine.generatePressed(extColors.danger, mode);
   }
 
-  // Link text color
-  if (colors.linkText) {
-    result.linkText = colors.linkText;
+  // Status colors - Success
+  if (extColors.success) {
+    result.successFills = engine.generateSubtle(extColors.success, mode);
+    result.successText = extColors.success;
+    result.successPrimaryText = extColors.success;
   }
 
-  // Status colors
-  if (colors.danger) {
-    result.dangerFills = engine.generateSubtle(colors.danger, mode);
-    result.dangerText = colors.danger;
-    result.strokeDanger = engine.generateSubtle(colors.danger, mode);
-    result.strokeDangerEmphasis = colors.danger;
-    result.dangerPrimaryText = colors.danger;
-    result.interactiveDestructive = engine.generateSubtle(colors.danger, mode);
-    result.interactiveDestructiveHover = engine.generateHover(
-      colors.danger,
-      mode
-    );
-    result.interactiveDestructivePressed = engine.generatePressed(
-      colors.danger,
-      mode
-    );
+  // Status colors - Info
+  if (extColors.info) {
+    result.infoFills = engine.generateSubtle(extColors.info, mode);
+    result.infoText = extColors.info;
+    result.infoPrimaryText = extColors.info;
   }
 
-  if (colors.success) {
-    result.successFills = engine.generateSubtle(colors.success, mode);
-    result.successText = colors.success;
-    result.strokeSuccess = engine.generateSubtle(colors.success, mode);
-    result.strokeSuccessEmphasis = colors.success;
-    result.successPrimaryText = colors.success;
-  }
-
-  if (colors.info) {
-    result.infoFills = engine.generateSubtle(colors.info, mode);
-    result.infoText = colors.info;
-    result.strokeInfo = engine.generateSubtle(colors.info, mode);
-    result.strokeInfoEmphasis = colors.info;
-    result.infoPrimaryText = colors.info;
-  }
-
-  if (colors.alert) {
-    result.alertFills = engine.generateSubtle(colors.alert, mode);
-    result.strokeAlert = engine.generateSubtle(colors.alert, mode);
-    result.strokeAlertEmphasis = colors.alert;
-    result.alertPrimaryText = colors.alert;
+  // Status colors - Alert
+  if (extColors.alert) {
+    result.alertFills = engine.generateSubtle(extColors.alert, mode);
+    result.alertPrimaryText = extColors.alert;
   }
 
   return result;
@@ -103,79 +170,164 @@ export function generateSemanticColors(
 // Generate font variables
 export function generateFontVariables(
   fonts: ThemeCustomization["fonts"],
-  letterSpacing?: number,
-  fontWeightScale?: number
+  letterSpacing?: ThemeCustomization["letterSpacing"],
+  fontWeight?: ThemeCustomization["fontWeight"],
+  fontSize?: ThemeCustomization["fontSize"]
 ): Record<string, string> {
   const result: Record<string, string> = {};
-  const scale = fontWeightScale ?? 1;
 
   // Default to Inter if no fonts specified
   const bodyFont = fonts.body || "Inter";
   const headingFont = fonts.heading || "Inter";
   const monoFont = fonts.mono || "Menlo";
 
+  // Font weights: regular (400), medium (500), bold (600)
+  const regular = fontWeight?.regular ?? 400;
+  const medium = fontWeight?.medium ?? 500;
+  const bold = fontWeight?.bold ?? 600;
+
+  // Base font size (default 16px)
+  const baseSize = fontSize?.base ?? 16;
+  // Calculate offset from default 16px
+  const sizeOffset = baseSize - 16;
+
+  // Helper to calculate adjusted size
+  const size = (defaultPx: number) => defaultPx + sizeOffset;
+
+  // Convert px to em for letter spacing (px / 16 = em)
+  const bodyLetterSpacing = letterSpacing?.body
+    ? `${(letterSpacing.body / 16).toFixed(4)}em`
+    : undefined;
+  const headingLetterSpacing = letterSpacing?.heading
+    ? `${(letterSpacing.heading / 16).toFixed(4)}em`
+    : undefined;
+  const numbersLetterSpacing = letterSpacing?.numbers
+    ? `${(letterSpacing.numbers / 16).toFixed(4)}em`
+    : undefined;
+
   console.log("[generateFontVariables]", {
-    fontWeightScale,
-    scale,
+    fontWeight,
+    regular,
+    medium,
+    bold,
     bodyFont,
     headingFont,
     monoFont,
+    letterSpacing,
+    fontSize,
+    baseSize,
+    sizeOffset,
   });
 
-  // Helper to scale font weight
-  const w = (baseWeight: number) => Math.round(baseWeight * scale);
-
   if (bodyFont) {
-    result.fontBody = `${w(375)} 16px/1.5 ${bodyFont}`;
-    result.fontBodyLink = `${w(375)} 16px/1.5 ${bodyFont}`;
-    result.fontBodyHeavy = `${w(450)} 16px/1.5 ${bodyFont}`;
-    result.fontBodyMedium = `${w(375)} 16px/1.5 ${bodyFont}`;
-    result.fontBodySmall = `${w(375)} 14px/1.5 ${bodyFont}`;
-    result.fontBodySmallHeavy = `${w(450)} 14px/1.5 ${bodyFont}`;
-    result.fontBodyLarge = `${w(375)} 18px/1.5 ${bodyFont}`;
-    result.fontBodyLargeHeavy = `${w(450)} 18px/1.5 ${bodyFont}`;
-    result.fontLabel = `${w(375)} 16px/1.2 ${bodyFont}`;
-    result.fontLabelHeavy = `${w(450)} 16px/1.2 ${bodyFont}`;
-    result.fontLabelSmall = `${w(375)} 14px/1.2 ${bodyFont}`;
-    result.fontLabelSmallHeavy = `${w(450)} 14px/1.2 ${bodyFont}`;
-    result.fontLabelExtraSmall = `${w(375)} 12px/1.2 ${bodyFont}`;
-    result.fontLabelExtraSmallHeavy = `${w(450)} 12px/1.2 ${bodyFont}`;
-    result.fontLabelLarge = `${w(375)} 18px/1.2 ${bodyFont}`;
-    result.fontLabelLargeHeavy = `${w(450)} 18px/1.2 ${bodyFont}`;
-    result.fontLabelMedium = `${w(375)} 16px/1.2 ${bodyFont}`;
-    result.fontLabelMediumHeavy = `${w(450)} 16px/1.2 ${bodyFont}`;
-    result.fontLabel2ExtraSmall = `${w(375)} 12px/1.2 ${bodyFont}`;
-    result.fontLabel2ExtraSmallHeavy = `${w(450)} 12px/1.2 ${bodyFont}`;
+    result.fontBody = `${regular} ${size(16)}px/1.5 ${bodyFont}`;
+    result.fontBodyLink = `${regular} ${size(16)}px/1.5 ${bodyFont}`;
+    result.fontBodyHeavy = `${medium} ${size(16)}px/1.5 ${bodyFont}`;
+    result.fontBodyMedium = `${regular} ${size(16)}px/1.5 ${bodyFont}`;
+    result.fontBodySmall = `${regular} ${size(14)}px/1.5 ${bodyFont}`;
+    result.fontBodySmallHeavy = `${medium} ${size(14)}px/1.5 ${bodyFont}`;
+    result.fontBodyLarge = `${regular} ${size(18)}px/1.5 ${bodyFont}`;
+    result.fontBodyLargeHeavy = `${medium} ${size(18)}px/1.5 ${bodyFont}`;
+    result.fontLabel = `${regular} ${size(16)}px/1.2 ${bodyFont}`;
+    result.fontLabelHeavy = `${medium} ${size(16)}px/1.2 ${bodyFont}`;
+    result.fontLabelSmall = `${regular} ${size(14)}px/1.2 ${bodyFont}`;
+    result.fontLabelSmallHeavy = `${medium} ${size(14)}px/1.2 ${bodyFont}`;
+    result.fontLabelExtraSmall = `${regular} ${size(12)}px/1.2 ${bodyFont}`;
+    result.fontLabelExtraSmallHeavy = `${medium} ${size(12)}px/1.2 ${bodyFont}`;
+    result.fontLabelLarge = `${regular} ${size(18)}px/1.2 ${bodyFont}`;
+    result.fontLabelLargeHeavy = `${medium} ${size(18)}px/1.2 ${bodyFont}`;
+    result.fontLabelMedium = `${regular} ${size(16)}px/1.2 ${bodyFont}`;
+    result.fontLabelMediumHeavy = `${medium} ${size(16)}px/1.2 ${bodyFont}`;
+    result.fontLabel2ExtraSmall = `${regular} ${size(12)}px/1.2 ${bodyFont}`;
+    result.fontLabel2ExtraSmallHeavy = `${medium} ${size(12)}px/1.2 ${bodyFont}`;
   }
 
   if (headingFont) {
-    result.fontHeadingLarge = `${w(550)} 28px/1.15 ${headingFont}`;
-    result.fontHeadingMedium = `${w(550)} 24px/1.15 ${headingFont}`;
-    result.fontHeadingSmall = `${w(550)} 18px/1.25 ${headingFont}`;
-    result.fontHeadingExtraSmall = `${w(550)} 16px/1.25 ${headingFont}`;
+    result.fontHeadingLarge = `${bold} ${size(28)}px/1.15 ${headingFont}`;
+    result.fontHeadingMedium = `${bold} ${size(24)}px/1.15 ${headingFont}`;
+    result.fontHeadingSmall = `${bold} ${size(18)}px/1.25 ${headingFont}`;
+    result.fontHeadingExtraSmall = `${bold} ${size(16)}px/1.25 ${headingFont}`;
   }
 
   if (monoFont) {
-    result.fontNumber = `${w(375)} 16px/1.5 ${monoFont}`;
-    result.fontNumberHeavy = `${w(450)} 16px/1.5 ${monoFont}`;
-    result.fontNumberSmall = `${w(375)} 14px/1.5 ${monoFont}`;
-    result.fontNumberSmallHeavy = `${w(450)} 14px/1.5 ${monoFont}`;
-    result.fontNumberExtraSmall = `${w(375)} 12px/1.5 ${monoFont}`;
-    result.fontNumberExtraSmallHeavy = `${w(450)} 12px/1.5 ${monoFont}`;
-    result.fontNumberLarge = `${w(375)} 18px/1.5 ${monoFont}`;
-    result.fontNumberLargeHeavy = `${w(450)} 18px/1.5 ${monoFont}`;
-    result.fontNumberTitle = `${w(550)} 28px/1.5 ${monoFont}`;
-    result.fontNumberTitleMedium = `${w(550)} 24px/1.5 ${monoFont}`;
+    result.fontNumber = `${regular} ${size(16)}px/1.5 ${monoFont}`;
+    result.fontNumberHeavy = `${medium} ${size(16)}px/1.5 ${monoFont}`;
+    result.fontNumberSmall = `${regular} ${size(14)}px/1.5 ${monoFont}`;
+    result.fontNumberSmallHeavy = `${medium} ${size(14)}px/1.5 ${monoFont}`;
+    result.fontNumberExtraSmall = `${regular} ${size(12)}px/1.5 ${monoFont}`;
+    result.fontNumberExtraSmallHeavy = `${medium} ${size(12)}px/1.5 ${monoFont}`;
+    result.fontNumberLarge = `${regular} ${size(18)}px/1.5 ${monoFont}`;
+    result.fontNumberLargeHeavy = `${medium} ${size(18)}px/1.5 ${monoFont}`;
+    result.fontNumberTitle = `${bold} ${size(28)}px/1.5 ${monoFont}`;
+    result.fontNumberTitleMedium = `${bold} ${size(24)}px/1.5 ${monoFont}`;
   }
 
-  // Add letter spacing
-  if (letterSpacing !== undefined) {
-    const letterSpacingValue = `${letterSpacing}em`;
-    const letterSpacingKeys = Object.keys(result).map(
-      (key) => `${key}LetterSpacing`
-    );
-    letterSpacingKeys.forEach((key) => {
-      result[key] = letterSpacingValue;
+  // Add letter spacing per category
+  if (bodyLetterSpacing) {
+    // Body fonts
+    [
+      "fontBody",
+      "fontBodyLink",
+      "fontBodyMedium",
+      "fontBodySmall",
+      "fontBodyLarge",
+      "fontLabel",
+      "fontLabelSmall",
+      "fontLabelExtraSmall",
+      "fontLabelLarge",
+      "fontLabelMedium",
+      "fontLabel2ExtraSmall",
+    ].forEach((key) => {
+      result[`${key}LetterSpacing`] = bodyLetterSpacing;
+    });
+    // Body heavy fonts
+    [
+      "fontBodyHeavy",
+      "fontBodySmallHeavy",
+      "fontBodyLargeHeavy",
+      "fontLabelHeavy",
+      "fontLabelSmallHeavy",
+      "fontLabelExtraSmallHeavy",
+      "fontLabelLargeHeavy",
+      "fontLabelMediumHeavy",
+      "fontLabel2ExtraSmallHeavy",
+    ].forEach((key) => {
+      result[`${key}LetterSpacing`] = bodyLetterSpacing;
+    });
+  }
+
+  if (headingLetterSpacing) {
+    // Heading fonts
+    [
+      "fontHeadingLarge",
+      "fontHeadingMedium",
+      "fontHeadingSmall",
+      "fontHeadingExtraSmall",
+    ].forEach((key) => {
+      result[`${key}LetterSpacing`] = headingLetterSpacing;
+    });
+  }
+
+  if (numbersLetterSpacing) {
+    // Number/mono fonts
+    [
+      "fontNumber",
+      "fontNumberSmall",
+      "fontNumberExtraSmall",
+      "fontNumberLarge",
+      "fontNumberTitle",
+      "fontNumberTitleMedium",
+    ].forEach((key) => {
+      result[`${key}LetterSpacing`] = numbersLetterSpacing;
+    });
+    // Number heavy fonts
+    [
+      "fontNumberHeavy",
+      "fontNumberSmallHeavy",
+      "fontNumberExtraSmallHeavy",
+      "fontNumberLargeHeavy",
+    ].forEach((key) => {
+      result[`${key}LetterSpacing`] = numbersLetterSpacing;
     });
   }
 
@@ -183,40 +335,64 @@ export function generateFontVariables(
 }
 
 // Generate spacing scale
-export function generateSpacingScale(base: number): Record<string, string> {
-  return {
-    spacing0: "0px",
-    spacing3xs: `${base}px`,
-    spacing2xs: `${base * 2}px`,
-    spacingXs: `${base * 3}px`,
-    spacingS: `${base * 4}px`,
-    spacingM: `${base * 6}px`,
-    spacingL: `${base * 9}px`,
-    spacingXl: `${base * 12}px`,
-    spacing2xl: `${base * 18}px`,
-    spacing3xl: `${base * 24}px`,
+export function generateSpacingScale(
+  base: number,
+  customValues?: Partial<Record<string, number>>
+): Record<string, string> {
+  const defaults = {
+    spacing0: 0,
+    spacing3xs: base,
+    spacing2xs: base * 2,
+    spacingXs: base * 3,
+    spacingS: base * 4,
+    spacingM: base * 6,
+    spacingL: base * 9,
+    spacingXl: base * 12,
+    spacing2xl: base * 18,
+    spacing3xl: base * 24,
   };
+
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(defaults)) {
+    const customValue = customValues?.[key];
+    result[key] = `${customValue ?? value}px`;
+  }
+
+  return result;
 }
 
 // Generate border radius scale
 export function generateBorderRadiusScale(
-  base: number
+  base: number,
+  customValues?: Partial<Record<string, number>>
 ): Record<string, string> {
-  return {
-    rounded0: "0px",
-    rounded3xs: `${base}px`,
-    rounded2xs: `${base * 2}px`,
-    roundedXs: `${base * 3}px`,
-    roundedS: `${base * 4}px`,
-    roundedM: `${base * 5}px`,
-    roundedL: `${base * 6}px`,
-    roundedXl: `${base * 8}px`,
-    rounded2xl: `${base * 10}px`,
-    rounded3xl: `${base * 12}px`,
-    rounded4xl: `${base * 14}px`,
-    roundedFull: "999px",
-    roundedClickable: `${base * 5}px`,
+  const defaults = {
+    rounded0: 0,
+    rounded3xs: base,
+    rounded2xs: base * 2,
+    roundedXs: base * 3,
+    roundedS: base * 4,
+    roundedM: base * 5,
+    roundedL: base * 6,
+    roundedXl: base * 8,
+    rounded2xl: base * 10,
+    rounded3xl: base * 12,
+    rounded4xl: base * 14,
+    roundedClickable: base * 5,
   };
+
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(defaults)) {
+    const customValue = customValues?.[key];
+    result[key] = `${customValue ?? value}px`;
+  }
+
+  // roundedFull is always 999px
+  result.roundedFull = customValues?.roundedFull
+    ? `${customValues.roundedFull}px`
+    : "999px";
+
+  return result;
 }
 
 // Helper to convert shadow config to CSS string
@@ -280,75 +456,61 @@ export function generateShadows(
   return result;
 }
 
-// Helper to apply opacity to a color
-function applyOpacity(color: string, opacity: number): string {
-  const { r, g, b } = parseRGBA(color);
-  return `rgba(${r},${g},${b},${opacity})`;
-}
-
-// Generate stroke colors from base color and opacity
+// Generate stroke colors from individual stroke color settings
 export function generateStrokeColors(
-  strokeColors: ThemeCustomization["strokeColors"],
-  statusColors?: {
-    danger?: string;
-    success?: string;
-    info?: string;
-    alert?: string;
-    accent?: string;
-  }
+  strokeColors: ThemeCustomization["strokeColors"]
 ): Record<string, string> {
   const result: Record<string, string> = {};
 
-  if (!strokeColors.base) return result;
-
-  const baseColor = strokeColors.base;
-  const baseOpacity = strokeColors.opacity || 0.2;
-
-  // Default stroke (base opacity)
-  result.strokeDefault = applyOpacity(baseColor, baseOpacity);
-
-  // Interactive states (increasing opacity)
-  result.strokeInteractiveEl = applyOpacity(baseColor, baseOpacity * 2);
-  result.strokeInteractiveElHover = applyOpacity(baseColor, baseOpacity * 2.5);
-  result.strokeInteractiveElSelected = applyOpacity(
-    baseColor,
-    baseOpacity * 3.5
-  );
-
-  // Emphasis (higher opacity)
-  result.strokeEmphasis = applyOpacity(baseColor, baseOpacity * 2);
-
-  // Accent strokes (derive from accent color if available)
-  if (statusColors?.accent) {
-    result.strokeAccent = applyOpacity(statusColors.accent, baseOpacity);
-    result.strokeAccentEmphasis = applyOpacity(
-      statusColors.accent,
-      baseOpacity * 2
-    );
-  } else {
-    result.strokeAccent = applyOpacity(baseColor, baseOpacity * 0.6);
-    result.strokeAccentEmphasis = applyOpacity(baseColor, baseOpacity * 2);
+  // Base strokes
+  if (strokeColors.default) {
+    result.strokeDefault = strokeColors.default;
+  }
+  if (strokeColors.interactiveEl) {
+    result.strokeInteractiveEl = strokeColors.interactiveEl;
+  }
+  if (strokeColors.interactiveElHover) {
+    result.strokeInteractiveElHover = strokeColors.interactiveElHover;
+  }
+  if (strokeColors.interactiveElSelected) {
+    result.strokeInteractiveElSelected = strokeColors.interactiveElSelected;
+  }
+  if (strokeColors.emphasis) {
+    result.strokeEmphasis = strokeColors.emphasis;
+  }
+  
+  // Accent strokes
+  if (strokeColors.accent) {
+    result.strokeAccent = strokeColors.accent;
+  }
+  if (strokeColors.accentEmphasis) {
+    result.strokeAccentEmphasis = strokeColors.accentEmphasis;
   }
 
-  // Status strokes (derive from status colors if available)
-  if (statusColors?.info) {
-    result.strokeInfo = applyOpacity(statusColors.info, baseOpacity);
-    result.strokeInfoEmphasis = statusColors.info;
+  // Status strokes
+  if (strokeColors.info) {
+    result.strokeInfo = strokeColors.info;
   }
-
-  if (statusColors?.alert) {
-    result.strokeAlert = applyOpacity(statusColors.alert, baseOpacity);
-    result.strokeAlertEmphasis = statusColors.alert;
+  if (strokeColors.infoEmphasis) {
+    result.strokeInfoEmphasis = strokeColors.infoEmphasis;
   }
-
-  if (statusColors?.success) {
-    result.strokeSuccess = applyOpacity(statusColors.success, baseOpacity);
-    result.strokeSuccessEmphasis = statusColors.success;
+  if (strokeColors.alert) {
+    result.strokeAlert = strokeColors.alert;
   }
-
-  if (statusColors?.danger) {
-    result.strokeDanger = applyOpacity(statusColors.danger, baseOpacity);
-    result.strokeDangerEmphasis = statusColors.danger;
+  if (strokeColors.alertEmphasis) {
+    result.strokeAlertEmphasis = strokeColors.alertEmphasis;
+  }
+  if (strokeColors.success) {
+    result.strokeSuccess = strokeColors.success;
+  }
+  if (strokeColors.successEmphasis) {
+    result.strokeSuccessEmphasis = strokeColors.successEmphasis;
+  }
+  if (strokeColors.danger) {
+    result.strokeDanger = strokeColors.danger;
+  }
+  if (strokeColors.dangerEmphasis) {
+    result.strokeDangerEmphasis = strokeColors.dangerEmphasis;
   }
 
   return result;
@@ -384,42 +546,143 @@ export function generateChartPalette(
   chartColors: ThemeCustomization["chartColors"],
   mode: "light" | "dark"
 ): string[] {
-  const colors: string[] = [];
-
-  // Collect defined colors
-  if (chartColors.color1) colors.push(chartColors.color1);
-  if (chartColors.color2) colors.push(chartColors.color2);
-  if (chartColors.color3) colors.push(chartColors.color3);
-
-  if (colors.length === 0) return [];
-
-  const targetCount = mode === "light" ? 10 : 11;
   const palette: string[] = [];
 
-  // Strategy: distribute colors evenly across opacity variations
-  const opacities =
-    mode === "light" ? [1, 0.8, 0.6, 0.4] : [1, 0.8, 0.6, 0.4, 0.2];
-
-  colors.forEach((color) => {
+  // Helper to create color with opacity
+  const colorWithOpacity = (color: string, opacity: number): string => {
     const { r, g, b } = parseRGBA(color);
     // In dark mode, lighten the base colors slightly for better visibility
     const adjustedR = mode === "dark" ? Math.min(255, r + 20) : r;
     const adjustedG = mode === "dark" ? Math.min(255, g + 20) : g;
     const adjustedB = mode === "dark" ? Math.min(255, b + 20) : b;
+    return `rgba(${adjustedR},${adjustedG},${adjustedB},${opacity})`;
+  };
 
-    // Add color at different opacities
-    const numOpacities = Math.min(
-      opacities.length,
-      targetCount - palette.length
-    );
-    for (let i = 0; i < numOpacities && palette.length < targetCount; i++) {
-      palette.push(
-        `rgba(${adjustedR},${adjustedG},${adjustedB},${opacities[i]})`
-      );
-    }
-  });
+  const primaryColor = chartColors.primary;
+  const secondaryColor = chartColors.secondary;
+  const useDualMode = chartColors.useDualMode;
+
+  if (!primaryColor) return [];
+
+  if (useDualMode && secondaryColor) {
+    // Dual color mode: 10 colors
+    // Positions 1-4: Primary color with opacities 0.2, 0.4, 0.6, 0.8
+    // Position 5: Primary color (full opacity)
+    // Position 6: Secondary color (full opacity)
+    // Positions 7-10: Secondary color with opacities 0.8, 0.6, 0.4, 0.2
+    palette.push(colorWithOpacity(primaryColor, 0.2));  // Position 1
+    palette.push(colorWithOpacity(primaryColor, 0.4));  // Position 2
+    palette.push(colorWithOpacity(primaryColor, 0.6));  // Position 3
+    palette.push(colorWithOpacity(primaryColor, 0.8));  // Position 4
+    palette.push(colorWithOpacity(primaryColor, 1.0));  // Position 5 - Primary full
+    palette.push(colorWithOpacity(secondaryColor, 1.0)); // Position 6 - Secondary full
+    palette.push(colorWithOpacity(secondaryColor, 0.8)); // Position 7
+    palette.push(colorWithOpacity(secondaryColor, 0.6)); // Position 8
+    palette.push(colorWithOpacity(secondaryColor, 0.4)); // Position 9
+    palette.push(colorWithOpacity(secondaryColor, 0.2)); // Position 10
+  } else {
+    // Single color mode: 10 colors
+    // Positions 1-5: Primary color with opacities 0.5, 0.57, 0.65, 0.72, 0.85
+    // Position 6: Primary color (full opacity)
+    // Positions 7-10: Primary color with opacities 0.4, 0.3, 0.2, 0.1
+    palette.push(colorWithOpacity(primaryColor, 0.5));   // Position 1
+    palette.push(colorWithOpacity(primaryColor, 0.57));  // Position 2
+    palette.push(colorWithOpacity(primaryColor, 0.65));  // Position 3
+    palette.push(colorWithOpacity(primaryColor, 0.72));  // Position 4
+    palette.push(colorWithOpacity(primaryColor, 0.85));  // Position 5
+    palette.push(colorWithOpacity(primaryColor, 1.0));   // Position 6 - Full
+    palette.push(colorWithOpacity(primaryColor, 0.4));   // Position 7
+    palette.push(colorWithOpacity(primaryColor, 0.3));   // Position 8
+    palette.push(colorWithOpacity(primaryColor, 0.2));   // Position 9
+    palette.push(colorWithOpacity(primaryColor, 0.1));   // Position 10
+  }
 
   return palette;
+}
+
+// Generate fills from the new fills property
+function generateFillColors(
+  fills: ThemeCustomization["fills"]
+): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!fills) return result;
+
+  if (fills.backgroundFills) result.backgroundFills = fills.backgroundFills;
+  if (fills.containerFills) result.containerFills = fills.containerFills;
+  if (fills.overlayFills) result.overlayFills = fills.overlayFills;
+  if (fills.sunkFills) result.sunkFills = fills.sunkFills;
+  if (fills.containerHoverFills) result.containerHoverFills = fills.containerHoverFills;
+  if (fills.dangerFills) result.dangerFills = fills.dangerFills;
+  if (fills.successFills) result.successFills = fills.successFills;
+  if (fills.infoFills) result.infoFills = fills.infoFills;
+  if (fills.elevatedFills) result.elevatedFills = fills.elevatedFills;
+  if (fills.alertFills) result.alertFills = fills.alertFills;
+  if (fills.sunkBgFills) result.sunkBgFills = fills.sunkBgFills;
+  if (fills.invertedFills) result.invertedFills = fills.invertedFills;
+  if (fills.highlightSubtle) result.highlightSubtle = fills.highlightSubtle;
+
+  return result;
+}
+
+// Generate text colors from the new text property
+function generateTextColors(
+  text: ThemeCustomization["text"]
+): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!text) return result;
+
+  // Map brand text to accent text (they are the same)
+  if (text.brandText) {
+    result.brandText = text.brandText;
+    result.accentPrimaryText = text.brandText;
+  }
+  if (text.brandSecondaryText) {
+    result.brandSecondaryText = text.brandSecondaryText;
+    result.accentSecondaryText = text.brandSecondaryText;
+  }
+  // Also handle direct accentPrimaryText/accentSecondaryText values (overrides brand if both present)
+  if (text.accentPrimaryText) {
+    result.accentPrimaryText = text.accentPrimaryText;
+    result.brandText = text.accentPrimaryText;
+  }
+  if (text.accentSecondaryText) {
+    result.accentSecondaryText = text.accentSecondaryText;
+    result.brandSecondaryText = text.accentSecondaryText;
+  }
+  if (text.primaryText) result.primaryText = text.primaryText;
+  if (text.secondaryText) result.secondaryText = text.secondaryText;
+  if (text.disabledText) result.disabledText = text.disabledText;
+  if (text.dangerText) result.dangerText = text.dangerText;
+  if (text.successText) result.successText = text.successText;
+  if (text.linkText) result.linkText = text.linkText;
+  if (text.infoText) result.infoText = text.infoText;
+  if (text.alertText) result.alertText = text.alertText;
+  if (text.accentDisabledText) result.accentDisabledText = text.accentDisabledText;
+
+  return result;
+}
+
+// Generate interactive colors from the new interactive property
+function generateInteractiveColors(
+  interactive: ThemeCustomization["interactive"]
+): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!interactive) return result;
+
+  if (interactive.interactiveDefault) result.interactiveDefault = interactive.interactiveDefault;
+  if (interactive.interactiveHover) result.interactiveHover = interactive.interactiveHover;
+  if (interactive.interactivePressed) result.interactivePressed = interactive.interactivePressed;
+  if (interactive.interactiveDisabled) result.interactiveDisabled = interactive.interactiveDisabled;
+  if (interactive.interactiveAccent) result.interactiveAccent = interactive.interactiveAccent;
+  if (interactive.interactiveAccentHover) result.interactiveAccentHover = interactive.interactiveAccentHover;
+  if (interactive.interactiveAccentPressed) result.interactiveAccentPressed = interactive.interactiveAccentPressed;
+  if (interactive.interactiveAccentDisabled) result.interactiveAccentDisabled = interactive.interactiveAccentDisabled;
+  if (interactive.interactiveDestructive) result.interactiveDestructive = interactive.interactiveDestructive;
+  if (interactive.interactiveDestructiveHover) result.interactiveDestructiveHover = interactive.interactiveDestructiveHover;
+  if (interactive.interactiveDestructivePressed) result.interactiveDestructivePressed = interactive.interactiveDestructivePressed;
+  if (interactive.interactiveDestructiveDisabled) result.interactiveDestructiveDisabled = interactive.interactiveDestructiveDisabled;
+
+  return result;
 }
 
 // Generate complete theme for a single mode
@@ -432,27 +695,44 @@ export function generateCompleteTheme(
 
   const theme: Record<string, any> = {};
 
-  // Generate colors
+  // Generate colors from legacy colors object
   const colors = generateSemanticColors(customization.colors, engine, mode);
   Object.assign(theme, colors);
+
+  // Generate fills from new fills property (overrides legacy colors if present)
+  const fills = generateFillColors(customization.fills);
+  Object.assign(theme, fills);
+
+  // Generate text colors from new text property (overrides legacy colors if present)
+  const textColors = generateTextColors(customization.text);
+  Object.assign(theme, textColors);
+
+  // Generate interactive colors from new interactive property (overrides legacy colors if present)
+  const interactiveColors = generateInteractiveColors(customization.interactive);
+  Object.assign(theme, interactiveColors);
 
   // Generate fonts
   const fonts = generateFontVariables(
     customization.fonts,
-    customization.letterSpacing.base,
-    customization.fontWeight.scale
+    customization.letterSpacing,
+    customization.fontWeight,
+    customization.fontSize
   );
   Object.assign(theme, fonts);
 
   // Generate spacing
-  if (customization.spacing.base !== undefined) {
-    const spacing = generateSpacingScale(customization.spacing.base);
+  const { base: spacingBase, ...spacingCustomValues } = customization.spacing;
+  const hasSpacingCustomValues = Object.keys(spacingCustomValues).length > 0;
+  if (spacingBase !== undefined || hasSpacingCustomValues) {
+    const spacing = generateSpacingScale(spacingBase ?? 1, spacingCustomValues);
     Object.assign(theme, spacing);
   }
 
   // Generate border radius
-  if (customization.borderRadius.base !== undefined) {
-    const radius = generateBorderRadiusScale(customization.borderRadius.base);
+  const { base: radiusBase, ...radiusCustomValues } = customization.borderRadius;
+  const hasRadiusCustomValues = Object.keys(radiusCustomValues).length > 0;
+  if (radiusBase !== undefined || hasRadiusCustomValues) {
+    const radius = generateBorderRadiusScale(radiusBase ?? 2, radiusCustomValues);
     Object.assign(theme, radius);
   }
 
@@ -467,13 +747,7 @@ export function generateCompleteTheme(
   Object.assign(theme, shadows);
 
   // Generate stroke colors
-  const strokes = generateStrokeColors(customization.strokeColors, {
-    danger: customization.colors.danger,
-    success: customization.colors.success,
-    info: customization.colors.info,
-    alert: customization.colors.alert,
-    accent: customization.colors.primary,
-  });
+  const strokes = generateStrokeColors(customization.strokeColors);
   Object.assign(theme, strokes);
 
   // Generate chat colors

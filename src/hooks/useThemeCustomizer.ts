@@ -19,6 +19,9 @@ import { getPreset } from "../utils/themePresets";
 import { loadFont } from "../utils/fontLoader";
 
 const emptyThemeCustomization: ThemeCustomization = {
+  fills: {},
+  text: {},
+  interactive: {},
   colors: {},
   chartColors: {},
   strokeColors: {},
@@ -27,6 +30,7 @@ const emptyThemeCustomization: ThemeCustomization = {
   fonts: {},
   fontWeight: {},
   letterSpacing: {},
+  fontSize: {},
   spacing: {},
   borderRadius: {},
 };
@@ -88,7 +92,7 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
     state.dark.fonts.mono,
   ]);
 
-  // Update color
+  // Update color (legacy)
   const updateColor = useCallback(
     (key: keyof ThemeCustomization["colors"], value?: string) => {
       setState({
@@ -105,16 +109,72 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
     [state, currentMode, currentConfig, setState]
   );
 
+  // Update fill color
+  const updateFill = useCallback(
+    (key: keyof NonNullable<ThemeCustomization["fills"]>, value?: string) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          fills: {
+            ...currentConfig.fills,
+            [key]: value,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Update text color
+  const updateText = useCallback(
+    (key: keyof NonNullable<ThemeCustomization["text"]>, value?: string) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          text: {
+            ...currentConfig.text,
+            [key]: value,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Update interactive color
+  const updateInteractive = useCallback(
+    (key: keyof NonNullable<ThemeCustomization["interactive"]>, value?: string) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          interactive: {
+            ...currentConfig.interactive,
+            [key]: value,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
   // Update chart color
   const updateChartColor = useCallback(
-    (key: keyof ThemeCustomization["chartColors"], value?: string) => {
+    (key: keyof ThemeCustomization["chartColors"], value?: string | boolean) => {
+      // Handle boolean conversion for useDualMode
+      const processedValue = key === "useDualMode" 
+        ? (value === "true" || value === true ? true : undefined)
+        : value;
+      
       setState({
         ...state,
         [currentMode]: {
           ...currentConfig,
           chartColors: {
             ...currentConfig.chartColors,
-            [key]: value,
+            [key]: processedValue,
           },
         },
       });
@@ -141,13 +201,14 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
 
   // Update letter spacing
   const updateLetterSpacing = useCallback(
-    (value?: number) => {
+    (category: keyof ThemeCustomization["letterSpacing"], value?: number) => {
       setState({
         ...state,
         [currentMode]: {
           ...currentConfig,
           letterSpacing: {
-            base: value,
+            ...currentConfig.letterSpacing,
+            [category]: value,
           },
         },
       });
@@ -157,8 +218,9 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
 
   // Update font weight
   const updateFontWeight = useCallback(
-    (value?: number) => {
+    (category: keyof ThemeCustomization["fontWeight"], value?: number) => {
       console.log('[useThemeCustomizer] updateFontWeight called:', {
+        category,
         value,
         currentMode,
         before: currentConfig.fontWeight,
@@ -168,7 +230,25 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
         [currentMode]: {
           ...currentConfig,
           fontWeight: {
-            scale: value,
+            ...currentConfig.fontWeight,
+            [category]: value,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Update font size (base)
+  const updateFontSize = useCallback(
+    (value?: number) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          fontSize: {
+            ...currentConfig.fontSize,
+            base: value,
           },
         },
       });
@@ -208,11 +288,79 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
     [state, currentMode, currentConfig, setState]
   );
 
+  // Update individual spacing value
+  const updateIndividualSpacing = useCallback(
+    (key: string, value?: number) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          spacing: {
+            ...currentConfig.spacing,
+            [key]: value,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Update individual border radius value
+  const updateIndividualBorderRadius = useCallback(
+    (key: string, value?: number) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          borderRadius: {
+            ...currentConfig.borderRadius,
+            [key]: value,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Apply a full border radius preset (all values at once)
+  const applyBorderRadiusPreset = useCallback(
+    (values: Record<string, number>) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          borderRadius: {
+            ...currentConfig.borderRadius,
+            ...values,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
+  // Apply a full spacing preset (all values at once)
+  const applySpacingPreset = useCallback(
+    (values: Record<string, number>) => {
+      setState({
+        ...state,
+        [currentMode]: {
+          ...currentConfig,
+          spacing: {
+            ...currentConfig.spacing,
+            ...values,
+          },
+        },
+      });
+    },
+    [state, currentMode, currentConfig, setState]
+  );
+
   // Update stroke color
   const updateStrokeColor = useCallback(
     (
       key: keyof ThemeCustomization["strokeColors"],
-      value?: string | number
+      value?: string
     ) => {
       setState({
         ...state,
@@ -284,7 +432,7 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
     [state, currentMode, setState]
   );
 
-  // Load preset
+  // Load preset configuration for ThemeProvider
   const loadPreset = useCallback(
     (presetName: string) => {
       const preset = getPreset(presetName);
@@ -322,12 +470,20 @@ export function useThemeCustomizer(displayMode: ThemeMode) {
 
     // Update functions
     updateColor,
+    updateFill,
+    updateText,
+    updateInteractive,
     updateChartColor,
     updateFont,
     updateLetterSpacing,
     updateFontWeight,
+    updateFontSize,
     updateSpacing,
     updateBorderRadius,
+    updateIndividualSpacing,
+    updateIndividualBorderRadius,
+    applyBorderRadiusPreset,
+    applySpacingPreset,
     updateStrokeColor,
     updateChatColor,
     updateShadow,

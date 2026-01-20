@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { MainPanel } from "./components/MainPanel";
+import { ElementSelector } from "./components/ElementSelector";
 import { useThemeCustomizer } from "./hooks/useThemeCustomizer";
 
 interface AppProps {
@@ -11,6 +12,8 @@ interface AppProps {
 
 function App({ theme, setTheme }: AppProps) {
   const [sidebarTab, setSidebarTab] = useState("colors");
+  const [selectorMode, setSelectorMode] = useState(false);
+  const [currentPreset, setCurrentPreset] = useState("default");
 
   const {
     customization,
@@ -18,6 +21,9 @@ function App({ theme, setTheme }: AppProps) {
     darkTheme: customDarkTheme,
     currentMode,
     updateColor,
+    updateFill,
+    updateText,
+    updateInteractive,
     updateChartColor,
     updateStrokeColor,
     updateChatColor,
@@ -25,8 +31,13 @@ function App({ theme, setTheme }: AppProps) {
     updateFont,
     updateLetterSpacing,
     updateFontWeight,
+    updateFontSize,
     updateSpacing,
     updateBorderRadius,
+    updateIndividualSpacing,
+    updateIndividualBorderRadius,
+    applyBorderRadiusPreset,
+    applySpacingPreset,
     updateCustomCss,
     updateCurrentModeConfig,
     loadPreset,
@@ -38,6 +49,21 @@ function App({ theme, setTheme }: AppProps) {
     exportThemeCode,
     getShareUrl,
   } = useThemeCustomizer(theme);
+
+  const handleAddToCss = useCallback(
+    (selector: string) => {
+      const newCssBlock = `\n/* ${selector} */\n${selector} {\n  /* your styles here */\n}\n`;
+      const currentCss = customization.customCss || "";
+      updateCustomCss(currentCss + newCssBlock);
+      // Switch to CSS tab to show the added selector
+      setSidebarTab("css");
+    },
+    [customization.customCss, updateCustomCss]
+  );
+
+  const handleToggleSelectorMode = useCallback(() => {
+    setSelectorMode((prev) => !prev);
+  }, []);
 
   return (
     <div className="w-screen h-screen flex flex-col">
@@ -51,6 +77,13 @@ function App({ theme, setTheme }: AppProps) {
         onExport={exportThemeCode}
         onReset={clear}
         onShare={getShareUrl}
+        selectorMode={selectorMode}
+        onToggleSelectorMode={handleToggleSelectorMode}
+      />
+      <ElementSelector
+        isActive={selectorMode}
+        onClose={handleToggleSelectorMode}
+        onAddToCss={handleAddToCss}
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
@@ -58,7 +91,12 @@ function App({ theme, setTheme }: AppProps) {
           onValueChange={setSidebarTab}
           customization={customization}
           currentMode={currentMode}
+          currentPreset={currentPreset}
+          onPresetChange={setCurrentPreset}
           onColorChange={updateColor}
+          onFillChange={updateFill}
+          onTextChange={updateText}
+          onInteractiveChange={updateInteractive}
           onChartColorChange={updateChartColor}
           onStrokeColorChange={updateStrokeColor}
           onChatColorChange={updateChatColor}
@@ -66,8 +104,13 @@ function App({ theme, setTheme }: AppProps) {
           onFontChange={updateFont}
           onLetterSpacingChange={updateLetterSpacing}
           onFontWeightChange={updateFontWeight}
+          onFontSizeChange={updateFontSize}
           onSpacingChange={updateSpacing}
           onBorderRadiusChange={updateBorderRadius}
+          onIndividualSpacingChange={updateIndividualSpacing}
+          onIndividualBorderRadiusChange={updateIndividualBorderRadius}
+          onApplyBorderRadiusPreset={applyBorderRadiusPreset}
+          onApplySpacingPreset={applySpacingPreset}
           onCustomCssChange={updateCustomCss}
           onPresetSelect={loadPreset}
           onReset={clear}

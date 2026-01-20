@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Slider,
+  Button,
+  Input,
   Select,
   SelectContent,
   SelectGroup,
@@ -12,19 +14,45 @@ import {
 } from "@crayonai/react-ui";
 import { Section } from "./Section";
 import { ThemeCustomization } from "../types/theme";
-import { getPopularFonts, loadFont } from "../utils/fontLoader";
+import {
+  getPopularFonts,
+  loadFont,
+  getFontWeights,
+  getCommonWeights,
+} from "../utils/fontLoader";
 
 interface FontControlsProps {
   fonts: ThemeCustomization["fonts"];
   fontWeight: ThemeCustomization["fontWeight"];
   letterSpacing: ThemeCustomization["letterSpacing"];
+  fontSize: ThemeCustomization["fontSize"];
   onFontChange: (
     category: keyof ThemeCustomization["fonts"],
     value?: string
   ) => void;
-  onFontWeightChange: (value?: number) => void;
-  onLetterSpacingChange: (value?: number) => void;
+  onFontWeightChange: (
+    category: keyof ThemeCustomization["fontWeight"],
+    value?: number
+  ) => void;
+  onLetterSpacingChange: (
+    category: keyof ThemeCustomization["letterSpacing"],
+    value?: number
+  ) => void;
+  onFontSizeChange: (value?: number) => void;
 }
+
+// Weight label mapping
+const WEIGHT_LABELS: Record<number, string> = {
+  100: "Thin",
+  200: "Extra Light",
+  300: "Light",
+  400: "Regular",
+  500: "Medium",
+  600: "Semi Bold",
+  700: "Bold",
+  800: "Extra Bold",
+  900: "Black",
+};
 
 function FontSelector({
   label,
@@ -35,15 +63,19 @@ function FontSelector({
 }: {
   label: string;
   value?: string;
-  category: "sans-serif" | "serif" | "monospace";
+  category?: "sans-serif" | "serif" | "monospace" | "system" | "all";
   onChange: (value?: string) => void;
   placeholder: string;
 }) {
   const [isCustom, setIsCustom] = useState(false);
   const [customValue, setCustomValue] = useState("");
 
-  const fonts = getPopularFonts(category);
-  const systemFonts = getPopularFonts("system");
+  // Get all fonts for "allow all fonts" option
+  const allFonts = getPopularFonts(
+    category === "all" || category === undefined || category === "system" 
+      ? undefined 
+      : category
+  );
 
   const handleSelectChange = async (selected: string) => {
     if (selected === "custom") {
@@ -52,7 +84,7 @@ function FontSelector({
       onChange(undefined);
       setIsCustom(false);
     } else {
-      if (!systemFonts.includes(selected)) {
+      if (!getPopularFonts("system").includes(selected)) {
         try {
           await loadFont(selected);
         } catch (err) {
@@ -79,35 +111,18 @@ function FontSelector({
   };
 
   return (
-    <div style={{ marginBottom: "16px" }}>
-      <label
-        style={{
-          display: "block",
-          fontSize: "14px",
-          fontWeight: "400",
-          marginBottom: "8px",
-          color: "var(--crayon-primary-text)",
-        }}
-      >
-        {label}
-      </label>
-
+    <div className="font-picker">
+      <label className="font-picker__label">{label}</label>
+      <div className="font-picker__controls">
       {!isCustom ? (
         <Select value={value || ""} onValueChange={handleSelectChange}>
-          <SelectTrigger size="md" style={{ width: "100%" }}>
+            <SelectTrigger size="md" className="font-picker__select">
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Popular Fonts</SelectLabel>
-              {fonts.map((font) => (
-                <SelectItem key={font} value={font}>
-                  {font}
-                </SelectItem>
-              ))}
-              <SelectSeparator />
-              <SelectLabel>System Fonts</SelectLabel>
-              {systemFonts.map((font) => (
+                {allFonts.map((font) => (
                 <SelectItem key={font} value={font}>
                   {font}
                 </SelectItem>
@@ -118,61 +133,154 @@ function FontSelector({
           </SelectContent>
         </Select>
       ) : (
-        <div style={{ display: "flex", gap: "8px" }}>
-          <input
-            type="text"
+          <div className="font-picker__custom-input">
+            <Input
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
             placeholder="Enter Google Font name"
-            style={{
-              flex: 1,
-              padding: "12px",
-              fontSize: "14px",
-              border: "1px solid var(--crayon-stroke-emphasis)",
-              borderRadius: "6px",
-              background: "var(--crayon-background-fills)",
-              color: "var(--crayon-primary-text)",
-              outline: "none",
-            }}
             onKeyPress={(e) => {
               if (e.key === "Enter") {
                 handleCustomSubmit();
               }
             }}
+              style={{ flex: 1 }}
           />
-          <button
-            onClick={handleCustomSubmit}
-            style={{
-              padding: "12px 16px",
-              fontSize: "14px",
-              border: "1px solid var(--crayon-stroke-emphasis)",
-              borderRadius: "6px",
-              background: "var(--bg-secondary)",
-              color: "var(--crayon-primary-text)",
-              cursor: "pointer",
-            }}
-          >
+            <Button variant="secondary" onClick={handleCustomSubmit}>
             Load
-          </button>
-          <button
+            </Button>
+            <Button
+              variant="tertiary"
             onClick={() => {
               setIsCustom(false);
               setCustomValue("");
             }}
-            style={{
-              padding: "12px 16px",
-              fontSize: "14px",
-              border: "1px solid var(--crayon-stroke-emphasis)",
-              borderRadius: "6px",
-              background: "var(--bg-secondary)",
-              color: "var(--crayon-primary-text)",
-              cursor: "pointer",
-            }}
           >
             Cancel
-          </button>
+            </Button>
         </div>
       )}
+      </div>
+    </div>
+  );
+}
+
+function FontWeightSelector({
+  label,
+  description,
+  value,
+  defaultValue,
+  availableWeights,
+  onChange,
+}: {
+  label: string;
+  description: string;
+  value?: number;
+  defaultValue: number;
+  availableWeights: number[];
+  onChange: (value?: number) => void;
+}) {
+  const handleChange = (selected: string) => {
+    if (selected === "") {
+      onChange(undefined);
+    } else {
+      onChange(parseInt(selected, 10));
+    }
+  };
+
+  // Find the closest available weight to the default
+  const effectiveDefault = availableWeights.includes(defaultValue)
+    ? defaultValue
+    : availableWeights.reduce((prev, curr) =>
+        Math.abs(curr - defaultValue) < Math.abs(prev - defaultValue)
+          ? curr
+          : prev
+      );
+
+  const currentValue = value ?? effectiveDefault;
+
+  return (
+    <div className="font-picker">
+      <div className="font-picker__label-group">
+        <label className="font-picker__label">{label}</label>
+        <span className="font-picker__description">{description}</span>
+      </div>
+      <div className="font-picker__controls">
+        <Select
+          value={currentValue.toString()}
+          onValueChange={handleChange}
+        >
+          <SelectTrigger size="md" className="font-picker__select">
+            <SelectValue placeholder="Select weight..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {availableWeights.map((weight) => (
+                <SelectItem key={weight} value={weight.toString()}>
+                  {weight} - {WEIGHT_LABELS[weight] || "Custom"}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
+function LetterSpacingControl({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value?: number;
+  onChange: (value?: number) => void;
+}) {
+  const displayValue = value ?? 0;
+  const [localValue, setLocalValue] = useState(displayValue.toFixed(2));
+
+  // Update local value when prop changes
+  useEffect(() => {
+    setLocalValue(displayValue.toFixed(2));
+  }, [displayValue]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+  };
+
+  const handleBlur = () => {
+    const numValue = parseFloat(localValue);
+    if (!isNaN(numValue)) {
+      onChange(numValue);
+    } else {
+      // Reset to current value if invalid
+      setLocalValue(displayValue.toFixed(2));
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.currentTarget.blur();
+    }
+  };
+
+  return (
+    <div className="letter-spacing-row">
+      <label className="letter-spacing-row__label">{label}</label>
+      <div className="letter-spacing-row__input-group">
+        <input
+          type="number"
+          value={localValue}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          step="0.1"
+          min="-2"
+          max="4"
+          className="letter-spacing-row__input"
+        />
+        <span className="letter-spacing-row__unit">px</span>
+      </div>
     </div>
   );
 }
@@ -181,175 +289,133 @@ export function FontControls({
   fonts,
   fontWeight,
   letterSpacing,
+  fontSize,
   onFontChange,
   onFontWeightChange,
   onLetterSpacingChange,
+  onFontSizeChange,
 }: FontControlsProps) {
-  const letterSpacingValue = letterSpacing.base ?? 0;
-  const fontWeightScale = fontWeight.scale ?? 1;
+  // Get the effective fonts (with defaults)
+  const bodyFont = fonts.body || "Inter";
+  const headingFont = fonts.heading || "Inter";
+  const monoFont = fonts.mono || "Inter";
 
-  console.log('[FontControls] Render:', {
-    fonts,
-    fontWeight,
-    fontWeightScale,
-    letterSpacing,
-    letterSpacingValue,
-  });
+  // Calculate available weights for each category
+  const regularWeights = useMemo(() => {
+    // Regular weight affects body and mono fonts
+    return getCommonWeights([bodyFont, monoFont]);
+  }, [bodyFont, monoFont]);
+
+  const mediumWeights = useMemo(() => {
+    // Medium weight affects body and mono fonts (Heavy variants)
+    return getCommonWeights([bodyFont, monoFont]);
+  }, [bodyFont, monoFont]);
+
+  const boldWeights = useMemo(() => {
+    // Bold weight affects heading font
+    return getFontWeights(headingFont);
+  }, [headingFont]);
+
+  // Font size state (default 16px)
+  const currentFontSize = fontSize?.base ?? 16;
 
   return (
-    <div style={{ padding: "16px" }}>
+    <>
       <Section title="Font Family" defaultOpen={true}>
         <FontSelector
           label="Body Font"
           value={fonts.body}
           category="sans-serif"
           onChange={(value) => onFontChange("body", value)}
-          placeholder="Choose a font..."
+          placeholder="Inter"
         />
         <FontSelector
           label="Heading Font"
           value={fonts.heading}
           category="sans-serif"
           onChange={(value) => onFontChange("heading", value)}
-          placeholder="Choose a font..."
+          placeholder="Inter"
         />
         <FontSelector
-          label="Monospace Font"
+          label="Numbers"
           value={fonts.mono}
-          category="monospace"
+          category="all"
           onChange={(value) => onFontChange("mono", value)}
-          placeholder="Choose a monospace font..."
+          placeholder="Inter"
         />
+      </Section>
+
+      <Section title="Font Size" defaultOpen={false}>
+        <p className="section__description">
+          Base body font size. All other sizes adjust proportionally.
+        </p>
+        <div className="font-size-slider">
+          <div className="font-size-slider__header">
+            <span className="font-size-slider__label">Base Size</span>
+            <span className="font-size-slider__value">{currentFontSize}px</span>
+          </div>
+            <Slider
+            variant="continuous"
+            value={[currentFontSize]}
+            onValueChange={(values) => onFontSizeChange(values[0])}
+            min={12}
+            max={20}
+            step={1}
+          />
+          <div className="font-size-slider__range">
+            <span>12px</span>
+            <span>20px</span>
+          </div>
+        </div>
       </Section>
 
       <Section title="Font Weight" defaultOpen={false}>
-        <div style={{ marginBottom: "16px" }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: "14px",
-              fontWeight: "400",
-              marginBottom: "8px",
-              color: "var(--crayon-primary-text)",
-            }}
-          >
-            Weight Scale
-          </label>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <Slider
-              variant="continuous"
-              min={0.5}
-              max={1.5}
-              step={0.05}
-              value={[fontWeightScale]}
-              onValueChange={(values) => {
-                console.log('[FontControls] Slider changed:', values[0]);
-                onFontWeightChange(values[0]);
-              }}
-              style={{ flex: 1 }}
-              rightContent={
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginLeft: "12px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={fontWeightScale.toFixed(2)}
-                    readOnly
-                    style={{
-                      width: "80px",
-                      padding: "8px 12px",
-                      fontSize: "14px",
-                      border: "1px solid var(--crayon-stroke-emphasis)",
-                      borderRadius: "6px",
-                      background: "var(--crayon-background-fills)",
-                      color: "var(--crayon-primary-text)",
-                      textAlign: "right",
-                      outline: "none",
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: "14px",
-                      color: "var(--crayon-secondary-text)",
-                      minWidth: "30px",
-                    }}
-                  >
-                    ×
-                  </span>
-                </div>
-              }
-            />
-          </div>
-        </div>
+        <p className="section__description">
+          Select font weights based on what's available for your chosen fonts.
+        </p>
+        <FontWeightSelector
+          label="Regular"
+          description="Body text, labels"
+          value={fontWeight.regular}
+          defaultValue={400}
+          availableWeights={regularWeights}
+          onChange={(value) => onFontWeightChange("regular", value)}
+        />
+        <FontWeightSelector
+          label="Medium"
+          description="Emphasized text"
+          value={fontWeight.medium}
+          defaultValue={500}
+          availableWeights={mediumWeights}
+          onChange={(value) => onFontWeightChange("medium", value)}
+        />
+        <FontWeightSelector
+          label="Bold"
+          description="Headings"
+          value={fontWeight.bold}
+          defaultValue={600}
+          availableWeights={boldWeights}
+          onChange={(value) => onFontWeightChange("bold", value)}
+        />
       </Section>
 
       <Section title="Letter Spacing" defaultOpen={false}>
-        <div style={{ marginBottom: "16px" }}>
-          <label
-            style={{
-              display: "block",
-              fontSize: "14px",
-              fontWeight: "400",
-              marginBottom: "8px",
-              color: "var(--crayon-primary-text)",
-            }}
-          >
-            Base Letter Spacing
-          </label>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <Slider
-              variant="continuous"
-              min={-0.05}
-              max={0.1}
-              step={0.01}
-              value={[letterSpacingValue]}
-              onValueChange={(values) => onLetterSpacingChange(values[0])}
-              style={{ flex: 1 }}
-              rightContent={
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginLeft: "12px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={letterSpacingValue.toFixed(2)}
-                    readOnly
-                    style={{
-                      width: "80px",
-                      padding: "8px 12px",
-                      fontSize: "14px",
-                      border: "1px solid var(--crayon-stroke-emphasis)",
-                      borderRadius: "6px",
-                      background: "var(--crayon-background-fills)",
-                      color: "var(--crayon-primary-text)",
-                      textAlign: "right",
-                      outline: "none",
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: "14px",
-                      color: "var(--crayon-secondary-text)",
-                      minWidth: "30px",
-                    }}
-                  >
-                    em
-                  </span>
-                </div>
-              }
-            />
-          </div>
-        </div>
+        <LetterSpacingControl
+          label="Body"
+          value={letterSpacing.body}
+          onChange={(value) => onLetterSpacingChange("body", value)}
+        />
+        <LetterSpacingControl
+          label="Heading"
+          value={letterSpacing.heading}
+          onChange={(value) => onLetterSpacingChange("heading", value)}
+        />
+        <LetterSpacingControl
+          label="Numbers"
+          value={letterSpacing.numbers}
+          onChange={(value) => onLetterSpacingChange("numbers", value)}
+        />
       </Section>
-    </div>
+    </>
   );
 }

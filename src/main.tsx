@@ -5,6 +5,8 @@ import { Toaster } from "sonner";
 import "@crayonai/react-ui/styles/index.css";
 import App from "./App";
 import "./style.css";
+import "./components.css";
+import { initializeTheme } from "./themes/themeManager";
 
 function Root() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
@@ -12,6 +14,11 @@ function Root() {
   React.useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
+
+  React.useEffect(() => {
+    // Initialize theme on app load
+    initializeTheme();
+  }, []);
 
   return (
     <ThemeProvider mode={theme}>
