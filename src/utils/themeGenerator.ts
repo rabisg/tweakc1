@@ -758,6 +758,26 @@ export function generateCompleteTheme(
   return theme;
 }
 
+export interface PlaygroundExport {
+  themeJson: string;
+  lightCss: string;
+  darkCss: string;
+}
+
+export function generatePlaygroundExport(
+  lightCustomization: ThemeCustomization,
+  darkCustomization: ThemeCustomization
+): PlaygroundExport {
+  const lightTheme = generateCompleteTheme(lightCustomization, "light");
+  const darkTheme = generateCompleteTheme(darkCustomization, "dark");
+
+  return {
+    themeJson: JSON.stringify({ theme: lightTheme, darkTheme }, null, 2),
+    lightCss: lightCustomization.customCss ?? "",
+    darkCss: darkCustomization.customCss ?? "",
+  };
+}
+
 // Generate TypeScript code for export
 export function generateThemeCode(
   lightCustomization: ThemeCustomization,

@@ -8,21 +8,25 @@ import "./style.css";
 import "./components.css";
 import { initializeTheme } from "./themes/themeManager";
 
+const urlParams = new URLSearchParams(window.location.search);
+const isEmbedMode = urlParams.get("embed") === "true";
+const initialTheme =
+  urlParams.get("theme") === "light" ? "light" : "dark";
+
 function Root() {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">(initialTheme);
 
   React.useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   React.useEffect(() => {
-    // Initialize theme on app load
     initializeTheme();
   }, []);
 
   return (
     <ThemeProvider mode={theme}>
-      <App theme={theme} setTheme={setTheme} />
+      <App theme={theme} setTheme={setTheme} embedMode={isEmbedMode} />
       <Toaster />
     </ThemeProvider>
   );
