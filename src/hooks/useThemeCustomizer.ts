@@ -9,6 +9,7 @@ import { useHistory } from "./useHistory";
 import {
   generateCompleteTheme,
   generateThemeCode,
+  generatePlaygroundExport,
 } from "../utils/themeGenerator";
 import {
   generateShareUrl,
@@ -458,9 +459,14 @@ export function useThemeCustomizer(
     };
   }, [state.light, state.dark]);
 
-  // Export theme code
+  // Export theme code (TypeScript format)
   const exportThemeCode = useCallback(() => {
     return generateThemeCode(state.light, state.dark);
+  }, [state.light, state.dark]);
+
+  // Export for Playground (raw JSON + CSS)
+  const exportPlaygroundTheme = useCallback(() => {
+    return generatePlaygroundExport(state.light, state.dark);
   }, [state.light, state.dark]);
 
   // Generate share URL
@@ -508,6 +514,7 @@ export function useThemeCustomizer(
 
     // Export
     exportThemeCode,
+    exportPlaygroundTheme,
     getShareUrl,
   };
 }

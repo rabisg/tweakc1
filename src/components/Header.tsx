@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button, IconButton, SwitchItem, Tabs, TabsList, TabsTrigger } from "@crayonai/react-ui";
-import { Undo2, Redo2, RotateCcw, Upload, Code2 } from "lucide-react";
+import { Undo2, Redo2, RotateCcw, Upload, Code2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { ExportModal } from "./ExportModal";
+import { ImportJsonModal } from "./ImportJsonModal";
+import type { PlaygroundExport } from "../utils/themeGenerator";
 import "./Header.css";
 
 interface HeaderProps {
@@ -13,10 +15,12 @@ interface HeaderProps {
   canUndo: boolean;
   canRedo: boolean;
   onExport: () => string;
+  onExportPlayground: () => PlaygroundExport;
   onReset: () => void;
   onShare: () => Promise<string>;
   selectorMode: boolean;
   onToggleSelectorMode: () => void;
+  onImportJson: (themeObject: Record<string, any>) => void;
 }
 
 export function Header({
@@ -27,13 +31,21 @@ export function Header({
   canUndo,
   canRedo,
   onExport,
+  onExportPlayground,
   onReset,
   onShare,
   selectorMode,
   onToggleSelectorMode,
+  onImportJson,
 }: HeaderProps) {
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [themeCode, setThemeCode] = useState("");
+  const [playgroundExport, setPlaygroundExport] = useState<PlaygroundExport>({
+    themeJson: "",
+    lightCss: "",
+    darkCss: "",
+  });
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -56,6 +68,7 @@ export function Header({
 
   const handleExport = () => {
     setThemeCode(onExport());
+    setPlaygroundExport(onExportPlayground());
     setShowExportModal(true);
   };
 
@@ -132,6 +145,13 @@ export function Header({
             </Button>
             <Button
               variant="secondary"
+              iconLeft={<Download size={14} />}
+              onClick={() => setShowImportModal(true)}
+            >
+              Import
+            </Button>
+            <Button
+              variant="secondary"
               iconRight={<Upload size={14} />}
               onClick={handleShare}
             >
@@ -151,6 +171,12 @@ export function Header({
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
         themeCode={themeCode}
+        playgroundExport={playgroundExport}
+      />
+      <ImportJsonModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImport={onImportJson}
       />
     </>
   );
